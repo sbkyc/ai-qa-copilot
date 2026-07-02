@@ -8,7 +8,7 @@ Generate a demo diagnosis from all examples:
 python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
 ```
 
-If no provider key is configured, the command writes a fallback report. With a configured provider, the prompt includes all example failure contexts below.
+If no provider key is configured, the command writes a fallback report. With a configured provider, the prompt asks for a failure mode matrix and groups the example contexts before sending them to the AI provider.
 
 | File | Scenario | What It Demonstrates |
 | --- | --- | --- |

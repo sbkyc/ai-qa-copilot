@@ -54,6 +54,18 @@ def test_example_docs_reference_every_artifact_file():
         assert filename in sample_report
 
 
+def test_sample_diagnosis_report_has_failure_mode_matrix():
+    sample_report = (EXAMPLES / "sample-ai-diagnosis.md").read_text(encoding="utf-8")
+
+    assert "## Failure Mode Matrix" in sample_report
+    assert "| Failure Mode | Artifact | Likely Classification | Next Action |" in sample_report
+    assert "Product/API behavior" in sample_report
+    assert "API contract" in sample_report
+    assert "UI/E2E behavior" in sample_report
+    assert "Flaky/timing" in sample_report
+    assert "Environment/setup" in sample_report
+
+
 def test_example_artifacts_cover_core_qa_failure_modes():
     artifacts = load_failure_artifacts(EXAMPLES)
     keywords = {keyword for artifact in artifacts for keyword in artifact.keywords}
@@ -78,3 +90,16 @@ def test_example_artifacts_build_rich_diagnosis_prompt():
     assert "passed 7 times and failed 3 times" in prompt
     assert "tests/conftest.py::db_seed_fixture" in prompt
     assert "sqlite3.OperationalError" in prompt
+
+
+def test_example_artifacts_prompt_groups_demo_failure_modes():
+    artifacts = load_failure_artifacts(EXAMPLES)
+
+    prompt = build_diagnosis_prompt(artifacts)
+
+    assert "Failure mode groups:" in prompt
+    assert "### Product/API behavior" in prompt
+    assert "### API contract" in prompt
+    assert "### UI/E2E behavior" in prompt
+    assert "### Flaky/timing" in prompt
+    assert "### Environment/setup" in prompt

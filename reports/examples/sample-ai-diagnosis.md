@@ -4,6 +4,16 @@
 
 The example artifact set shows five common QA failure modes: API status mismatch, Playwright visibility failure, API contract mismatch, flaky UI timing, and fixture/setup failure.
 
+## Failure Mode Matrix
+
+| Failure Mode | Artifact | Likely Classification | Next Action |
+| --- | --- | --- | --- |
+| Product/API behavior | `sample-failure.json` | Product bug | Map insufficient-stock domain errors to HTTP `409` instead of leaking `500`. |
+| API contract | `api-contract-failure.json` | Product bug or test contract drift | Compare the request body, validation schema, and expected response contract. |
+| UI/E2E behavior | `playwright-visibility-failure.json` | Product bug or UI readiness bug | Inspect checkout state, screenshot, and trace around the hidden `Pay now` button. |
+| Flaky/timing | `flaky-search-failure.json` | Flaky test | Wait on stable search results instead of racing debounce and fetch state. |
+| Environment/setup | `fixture-setup-failure.json` | Environment issue | Ensure database initialization runs before seed fixtures touch `products`. |
+
 ## Suspected root cause
 
 - `sample-failure.json`: the order API likely lets a stock validation exception escape as HTTP `500` instead of mapping it to HTTP `409`.

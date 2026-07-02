@@ -30,7 +30,7 @@ The sample artifacts cover several realistic QA failure modes:
 - a flaky search test with repeated pass/fail history
 - a database fixture/setup failure
 
-The generated report is expected to explain the likely root cause, evidence, reproduction steps, suggested fix, risk level, and whether each failure looks like a product bug, test script bug, or environment issue.
+The generated report is expected to start with a failure mode matrix, then explain the likely root cause, evidence, reproduction steps, suggested fix, risk level, and whether each failure looks like a product bug, test script bug, flaky test, or environment issue.
 
 See [diagnosis-examples.md](diagnosis-examples.md) for the full example catalog.
 
