@@ -26,6 +26,8 @@ FastAPI demo shop
 
 See [docs/architecture.md](docs/architecture.md) for the full architecture and failure diagnosis flow.
 
+See [docs/api-reference.md](docs/api-reference.md) for API endpoints and example payloads.
+
 ## Screenshots
 
 ![Login screen](docs/assets/login-screen.png)
