@@ -2,6 +2,8 @@
 
 AI QA Copilot is a Python portfolio project that combines automated testing and AI-assisted failure diagnosis.
 
+中文简介：这是一个面向求职展示的 AI 自动化测试平台。它用 Python 完成接口测试、浏览器 E2E 测试、CI 报告和 AI 失败诊断，适合展示从自动化测试向 AI 应用开发迁移的能力。
+
 ## What It Demonstrates
 
 - FastAPI demo application used as the system under test
@@ -23,6 +25,12 @@ FastAPI demo shop
 ```
 
 See [docs/architecture.md](docs/architecture.md) for the full architecture and failure diagnosis flow.
+
+## Screenshots
+
+![Login screen](docs/assets/login-screen.png)
+
+![Products screen](docs/assets/products-screen.png)
 
 ## Local Setup
 
@@ -89,9 +97,15 @@ See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
 - `reports/examples/sample-failure.json`
 - `reports/examples/sample-ai-diagnosis.md`
 
+## Publish To GitHub
+
+See [docs/github-publish.md](docs/github-publish.md) for the GitHub publishing checklist.
+
 ## For Chinese Interviews
 
 See [docs/resume-zh.md](docs/resume-zh.md) for a Chinese resume description and interview talking points.
+
+See [docs/interview-qa.md](docs/interview-qa.md) for interview questions and suggested answers.
 
 ## Resume Description
 
