@@ -16,3 +16,17 @@ class LoginResponse(BaseModel):
 class OrderRequest(BaseModel):
     product_id: int = Field(gt=0)
     quantity: int = Field(gt=0)
+
+
+class DiagnosisRequest(BaseModel):
+    nodeid: str = Field(min_length=1)
+    failed_at: str = Field(min_length=1)
+    phase: str = Field(min_length=1)
+    duration_seconds: float = Field(ge=0)
+    longrepr: str = Field(min_length=1)
+    keywords: list[str] = Field(default_factory=list)
+
+
+class DiagnosisResponse(BaseModel):
+    artifact_count: int
+    report_markdown: str

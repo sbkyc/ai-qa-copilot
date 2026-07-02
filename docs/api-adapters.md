@@ -66,6 +66,34 @@ The AI diagnosis feature must not break CI. The CLI writes a fallback Markdown r
 
 The normal pytest HTML report and JSON failure artifacts remain available even when AI diagnosis is skipped.
 
+## Diagnosis HTTP Endpoint
+
+The FastAPI demo app exposes `POST /api/diagnosis` for API-based integration demos.
+
+Request body:
+
+```json
+{
+  "nodeid": "tests/api/test_orders_api.py::test_create_order",
+  "failed_at": "2026-07-02T10:00:00+00:00",
+  "phase": "call",
+  "duration_seconds": 0.12,
+  "longrepr": "AssertionError: expected 409 but got 500",
+  "keywords": ["api", "orders"]
+}
+```
+
+Response body:
+
+```json
+{
+  "artifact_count": 1,
+  "report_markdown": "## Summary\n\n..."
+}
+```
+
+This endpoint uses the same provider layer as the CLI, so it supports the same `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_BASE_URL` environment variables.
+
 ## Adding Another Provider
 
 To add another provider:

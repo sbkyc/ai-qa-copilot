@@ -11,7 +11,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.db import connect, initialize_database, seed_database
-from app.schemas import LoginRequest, LoginResponse, OrderRequest
+from app.schemas import (
+    DiagnosisRequest,
+    DiagnosisResponse,
+    LoginRequest,
+    LoginResponse,
+    OrderRequest,
+)
 from app.services import (
     AuthenticationError,
     InsufficientStockError,
@@ -23,6 +29,9 @@ from app.services import (
     token_for_username,
     username_from_token,
 )
+from qa_copilot.artifacts import FailureArtifact
+from qa_copilot.diagnosis import diagnose_with_ai
+from qa_copilot.prompt_builder import build_diagnosis_prompt
 
 templates = Jinja2Templates(directory="app/templates")
 
@@ -109,6 +118,20 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except InsufficientStockError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    @api.post("/api/diagnosis", response_model=DiagnosisResponse)
+    def diagnosis_create(payload: DiagnosisRequest) -> DiagnosisResponse:
+        artifact = FailureArtifact(
+            nodeid=payload.nodeid,
+            failed_at=payload.failed_at,
+            phase=payload.phase,
+            duration_seconds=payload.duration_seconds,
+            longrepr=payload.longrepr,
+            keywords=payload.keywords,
+        )
+        prompt = build_diagnosis_prompt([artifact])
+        report = diagnose_with_ai(prompt)
+        return DiagnosisResponse(artifact_count=1, report_markdown=report)
 
     @api.get("/", response_class=HTMLResponse)
     def login_page(request: Request) -> HTMLResponse:

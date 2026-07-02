@@ -11,6 +11,7 @@ flowchart LR
     D --> E["Prompt Builder"]
     E --> F["Optional OpenAI Diagnosis"]
     F --> G["Markdown Diagnosis Report"]
+    J["POST /api/diagnosis"] --> E
     B --> H["pytest HTML Report"]
     C --> H
     G --> I["GitHub Actions Artifacts"]

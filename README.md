@@ -104,6 +104,21 @@ The AI call is isolated behind a provider layer, so it can use OpenAI directly o
 
 See [docs/api-adapters.md](docs/api-adapters.md) for configuration details.
 
+## Diagnosis API Endpoint
+
+The demo app also exposes an API endpoint for generating a diagnosis from failure context:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/diagnosis -ContentType "application/json" -Body '{
+  "nodeid": "tests/api/test_orders_api.py::test_create_order",
+  "failed_at": "2026-07-02T10:00:00+00:00",
+  "phase": "call",
+  "duration_seconds": 0.12,
+  "longrepr": "AssertionError: expected 409 but got 500",
+  "keywords": ["api", "orders"]
+}'
+```
+
 ## Example Artifacts
 
 - `reports/examples/sample-failure.json`
