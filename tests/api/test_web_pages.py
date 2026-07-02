@@ -8,6 +8,13 @@ def test_login_page_renders(client):
     assert "AI QA Demo Shop" in response.text
 
 
+def test_login_page_links_stylesheet(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert 'href="/static/styles.css"' in response.text
+
+
 def test_web_login_redirects_to_products(client):
     response = client.post(
         "/login",

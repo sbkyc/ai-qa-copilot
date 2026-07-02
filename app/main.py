@@ -7,6 +7,7 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.db import connect, initialize_database, seed_database
@@ -55,6 +56,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             connection.close()
 
     api = FastAPI(title="AI QA Copilot Demo Shop", lifespan=lifespan)
+    api.mount("/static", StaticFiles(directory="app/static"), name="static")
 
     def get_db() -> sqlite3.Connection:
         return api.state.db

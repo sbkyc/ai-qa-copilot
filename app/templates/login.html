@@ -2,25 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AI QA Demo Shop</title>
+    <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
-    <main>
-      <h1>AI QA Demo Shop</h1>
-      <form method="post" action="/login">
-        <label>
-          Username
-          <input name="username" value="alice">
-        </label>
-        <label>
-          Password
-          <input name="password" type="password" value="password123">
-        </label>
-        <button type="submit">Sign in</button>
-      </form>
-      {% if error %}
-        <p role="alert">{{ error }}</p>
-      {% endif %}
+    <header class="topbar">
+      <a class="brand" href="/">AI QA Copilot</a>
+      <span class="topbar-meta">Demo shop under test</span>
+    </header>
+    <main class="auth-layout">
+      <section class="auth-copy" aria-labelledby="page-title">
+        <h1 id="page-title">AI QA Demo Shop</h1>
+        <p>
+          A compact FastAPI shop used to demonstrate API automation, browser E2E testing,
+          CI reports, and AI-assisted failure diagnosis.
+        </p>
+      </section>
+      <section class="panel auth-panel" aria-label="Sign in form">
+        <form method="post" action="/login">
+          <label>
+            Username
+            <input name="username" value="alice" autocomplete="username">
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" value="password123" autocomplete="current-password">
+          </label>
+          <button type="submit">Sign in</button>
+        </form>
+        {% if error %}
+          <p role="alert" class="alert">{{ error }}</p>
+        {% endif %}
+      </section>
     </main>
   </body>
 </html>
