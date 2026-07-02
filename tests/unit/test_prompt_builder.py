@@ -65,3 +65,22 @@ def test_build_diagnosis_prompt_groups_failure_modes():
     assert prompt.index("### Environment/setup") < prompt.index(
         "tests/conftest.py::db_seed_fixture"
     )
+
+
+def test_build_diagnosis_prompt_prioritizes_setup_failures():
+    artifact = FailureArtifact(
+        nodeid="tests/e2e/test_checkout_flow.py::test_setup_before_checkout",
+        failed_at="2026-07-02T10:05:00+00:00",
+        phase="setup",
+        duration_seconds=0.07,
+        longrepr="TimeoutError: fixture setup failed before checkout",
+        keywords=["api", "contract", "playwright", "flaky", "setup"],
+    )
+
+    prompt = build_diagnosis_prompt([artifact])
+
+    assert "### Environment/setup" in prompt
+    assert "### Flaky/timing" not in prompt
+    assert "### API contract" not in prompt
+    assert "### UI/E2E behavior" not in prompt
+    assert "### Product/API behavior" not in prompt

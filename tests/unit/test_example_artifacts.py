@@ -58,7 +58,15 @@ def test_sample_diagnosis_report_has_failure_mode_matrix():
     sample_report = (EXAMPLES / "sample-ai-diagnosis.md").read_text(encoding="utf-8")
 
     assert "## Failure Mode Matrix" in sample_report
-    assert "| Failure Mode | Artifact | Likely Classification | Next Action |" in sample_report
+    assert (
+        "| Failure Mode | Affected Test / Artifact | Evidence | "
+        "Likely Classification | Next Action |"
+    ) in sample_report
+    assert (
+        "`tests/api/test_orders_api.py::test_create_order_rejects_insufficient_stock` / "
+        "`sample-failure.json`"
+    ) in sample_report
+    assert "Expected `409`, received `500`" in sample_report
     assert "Product/API behavior" in sample_report
     assert "API contract" in sample_report
     assert "UI/E2E behavior" in sample_report
