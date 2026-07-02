@@ -30,3 +30,12 @@ class DiagnosisRequest(BaseModel):
 class DiagnosisResponse(BaseModel):
     artifact_count: int
     report_markdown: str
+
+
+class ProviderHealthResponse(BaseModel):
+    ok: bool
+    provider: str
+    api_style: str
+    api_key_configured: bool
+    missing: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)

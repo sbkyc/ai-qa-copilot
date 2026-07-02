@@ -17,6 +17,7 @@ from app.schemas import (
     LoginRequest,
     LoginResponse,
     OrderRequest,
+    ProviderHealthResponse,
 )
 from app.services import (
     AuthenticationError,
@@ -32,6 +33,7 @@ from app.services import (
 from qa_copilot.artifacts import FailureArtifact
 from qa_copilot.diagnosis import diagnose_with_ai
 from qa_copilot.prompt_builder import build_diagnosis_prompt
+from qa_copilot.provider_health import check_provider_health
 from qa_copilot.providers import supported_provider_specs
 
 templates = Jinja2Templates(directory="app/templates")
@@ -137,6 +139,10 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
     @api.get("/api/ai-providers")
     def ai_providers() -> dict[str, dict[str, dict[str, object]]]:
         return {"providers": supported_provider_specs()}
+
+    @api.get("/api/provider-health", response_model=ProviderHealthResponse)
+    def provider_health() -> ProviderHealthResponse:
+        return ProviderHealthResponse(**check_provider_health())
 
     @api.get("/", response_class=HTMLResponse)
     def login_page(request: Request) -> HTMLResponse:
