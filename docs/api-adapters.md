@@ -57,6 +57,14 @@ Check the current provider configuration:
 python -m qa_copilot.cli --check-provider
 ```
 
+The CLI prints detailed local diagnostics, including model, base URL, and which environment variable supplied the key. It never prints the key value itself.
+
+Use `--fail-on-error` when a script should fail if the provider configuration is unhealthy:
+
+```powershell
+python -m qa_copilot.cli --check-provider --fail-on-error
+```
+
 Or from the demo app:
 
 ```text
@@ -66,6 +74,13 @@ GET /api/ai-providers
 ```text
 GET /api/provider-health
 ```
+
+The API health response is redacted for safe use in demos and future UI panels. It returns status fields such as `ok`, `provider`, `api_style`, `api_key_configured`, `missing`, and `errors`, but it does not expose model names, custom base URLs, or key environment variable names.
+
+Known provider health errors:
+
+- `unsupported_provider`: `AI_PROVIDER` is not one of the supported presets.
+- `unsupported_api_style`: `AI_API_STYLE` is not `chat` or `responses`.
 
 | Provider | API style | Default base URL | Default model | API key env |
 | --- | --- | --- | --- | --- |

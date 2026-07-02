@@ -126,6 +126,12 @@ Check the current provider configuration:
 python -m qa_copilot.cli --check-provider
 ```
 
+Use `--fail-on-error` when a script should exit non-zero for an unhealthy provider configuration:
+
+```powershell
+python -m qa_copilot.cli --check-provider --fail-on-error
+```
+
 ## Diagnosis API Endpoint
 
 The demo app also exposes an API endpoint for generating a diagnosis from failure context:
@@ -152,6 +158,8 @@ Current provider configuration health is available at:
 ```text
 GET /api/provider-health
 ```
+
+This endpoint returns a redacted health summary. It does not expose API keys, key environment variable names, models, or custom base URLs.
 
 ## Example Artifacts
 

@@ -17,6 +17,7 @@ from app.schemas import (
     LoginRequest,
     LoginResponse,
     OrderRequest,
+    ProviderHealthResponse,
 )
 from app.services import (
     AuthenticationError,
@@ -139,9 +140,9 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
     def ai_providers() -> dict[str, dict[str, dict[str, object]]]:
         return {"providers": supported_provider_specs()}
 
-    @api.get("/api/provider-health")
-    def provider_health() -> dict[str, object]:
-        return check_provider_health()
+    @api.get("/api/provider-health", response_model=ProviderHealthResponse)
+    def provider_health() -> ProviderHealthResponse:
+        return ProviderHealthResponse(**check_provider_health())
 
     @api.get("/", response_class=HTMLResponse)
     def login_page(request: Request) -> HTMLResponse:

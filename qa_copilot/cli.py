@@ -29,17 +29,29 @@ def generate_report(input_path: str | Path, output_path: str | Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate AI QA diagnosis reports.")
-    parser.add_argument("--list-providers", action="store_true")
-    parser.add_argument("--check-provider", action="store_true")
+    provider_commands = parser.add_mutually_exclusive_group()
+    provider_commands.add_argument("--list-providers", action="store_true")
+    provider_commands.add_argument("--check-provider", action="store_true")
+    parser.add_argument(
+        "--fail-on-error",
+        action="store_true",
+        help="Exit with code 1 when --check-provider reports an unhealthy config.",
+    )
     parser.add_argument("--input", default="reports/latest/failures")
     parser.add_argument("--output", default="reports/latest/ai-diagnosis.md")
     args = parser.parse_args()
+
+    if args.fail_on_error and not args.check_provider:
+        parser.error("--fail-on-error requires --check-provider")
 
     if args.list_providers:
         print(json.dumps(supported_provider_specs(), indent=2, ensure_ascii=False))
         return
     if args.check_provider:
-        print(json.dumps(check_provider_health(), indent=2, ensure_ascii=False))
+        health = check_provider_health(include_internal=True)
+        print(json.dumps(health, indent=2, ensure_ascii=False))
+        if args.fail_on_error and not health["ok"]:
+            raise SystemExit(1)
         return
 
     generate_report(args.input, args.output)

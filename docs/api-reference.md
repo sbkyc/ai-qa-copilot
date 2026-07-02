@@ -129,7 +129,7 @@ Response:
 
 ### `GET /api/provider-health`
 
-Returns the current provider configuration status without exposing API keys.
+Returns the current provider configuration status without exposing API keys, API key environment variable names, models, or custom base URLs.
 
 Response:
 
@@ -137,14 +137,14 @@ Response:
 {
   "ok": true,
   "provider": "deepseek",
-  "model": "deepseek-chat",
-  "base_url": "https://api.deepseek.com",
   "api_style": "chat",
   "api_key_configured": true,
-  "api_key_source": "DEEPSEEK_API_KEY",
-  "missing": []
+  "missing": [],
+  "errors": []
 }
 ```
+
+Known `errors` values include `unsupported_provider` and `unsupported_api_style`.
 
 ### `POST /api/diagnosis`
 
