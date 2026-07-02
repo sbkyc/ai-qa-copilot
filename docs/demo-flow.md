@@ -1,6 +1,6 @@
 # Demo Failure Flow
 
-This project includes a sample failure artifact so reviewers can see the AI diagnosis workflow without breaking the test suite.
+This project includes curated failure artifacts so reviewers can see the AI diagnosis workflow without breaking the test suite.
 
 ## Generate A Demo Diagnosis Report
 
@@ -22,15 +22,17 @@ If `OPENAI_API_KEY` is configured, the same command sends the sample failure con
 
 ## What The Demo Shows
 
-The sample artifact describes an insufficient-stock order test that expected HTTP `409` but received HTTP `500`.
+The sample artifacts cover several realistic QA failure modes:
 
-The generated report is expected to explain:
+- an insufficient-stock API test that expected HTTP `409` but received HTTP `500`
+- a Playwright visibility failure with screenshot and trace references
+- an API contract mismatch with request and response evidence
+- a flaky search test with repeated pass/fail history
+- a database fixture/setup failure
 
-- the likely root cause
-- the evidence from the failed assertion
-- reproduction steps
-- a suggested fix
-- whether the failure looks like a product bug, test bug, or environment issue
+The generated report is expected to explain the likely root cause, evidence, reproduction steps, suggested fix, risk level, and whether each failure looks like a product bug, test script bug, or environment issue.
+
+See [diagnosis-examples.md](diagnosis-examples.md) for the full example catalog.
 
 ## Real CI Flow
 

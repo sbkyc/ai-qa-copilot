@@ -2,25 +2,34 @@
 
 ## Summary
 
-The insufficient stock order scenario returned HTTP 500 instead of the expected HTTP 409.
+The example artifact set shows five common QA failure modes: API status mismatch, Playwright visibility failure, API contract mismatch, flaky UI timing, and fixture/setup failure.
 
 ## Suspected root cause
 
-The order API is likely allowing a domain exception to escape without mapping it to a business error response.
+- `sample-failure.json`: the order API likely lets a stock validation exception escape as HTTP `500` instead of mapping it to HTTP `409`.
+- `playwright-visibility-failure.json`: the checkout flow likely leaves the `Pay now` button hidden because a required UI state or async payment readiness signal did not complete.
+- `api-contract-failure.json`: the order creation request/response contract drifted; the API returned validation errors where the test expected a created order payload.
+- `flaky-search-failure.json`: the search assertion likely races product fetch or debounce behavior, producing inconsistent result counts across runs.
+- `fixture-setup-failure.json`: database initialization did not finish before the seed fixture tried to insert or query product rows.
 
 ## Reproduction steps
 
-1. Log in as `alice`.
-2. Send `POST /api/orders` with `product_id=1` and `quantity=99`.
-3. Observe that the response status is 500.
+1. Generate the demo prompt from `reports/examples`.
+2. Review each artifact's `nodeid`, `phase`, `keywords`, and `longrepr`.
+3. Re-run the failing test node when it points to a real test.
+4. For Playwright failures, inspect the referenced screenshot and trace.
 
 ## Evidence
 
-The failing test expected status code 409 but received 500.
+The artifacts include status-code mismatches, locator visibility output, request/response snippets, flaky pass/fail history, and setup exception text.
 
 ## Suggested fix
 
-Catch the stock validation exception in the order endpoint and return HTTP 409 with a clear error message.
+- Map domain errors to explicit API responses.
+- Add UI readiness checks around checkout state transitions.
+- Keep API tests aligned with the public request/response schema.
+- Make flaky UI assertions wait on stable app state instead of transient counts.
+- Ensure database initialization runs before seed fixtures.
 
 ## Risk level
 
@@ -28,4 +37,4 @@ Medium
 
 ## Classification
 
-product bug
+Mixed: product bug, test script bug, and environment issue
