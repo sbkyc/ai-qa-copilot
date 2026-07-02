@@ -6,6 +6,52 @@ from qa_copilot.artifacts import load_failure_artifacts
 from qa_copilot.prompt_builder import build_diagnosis_prompt
 
 EXAMPLES = Path("reports/examples")
+CATALOG = Path("docs/diagnosis-examples.md")
+
+EXPECTED_EXAMPLE_FILES = {
+    "api-contract-failure.json",
+    "fixture-setup-failure.json",
+    "flaky-search-failure.json",
+    "playwright-visibility-failure.json",
+    "sample-failure.json",
+}
+SECRET_PATTERNS = (
+    "sk-",
+    "authorization",
+    "bearer ",
+    "api_key",
+    "password",
+    "cookie",
+)
+
+
+def test_example_artifact_file_set_is_intentional():
+    json_files = {path.name for path in EXAMPLES.glob("*.json")}
+
+    assert json_files == EXPECTED_EXAMPLE_FILES
+
+
+def test_all_example_json_files_are_loaded():
+    artifacts = load_failure_artifacts(EXAMPLES)
+
+    assert len(artifacts) == len(EXPECTED_EXAMPLE_FILES)
+
+
+def test_example_artifacts_do_not_contain_secret_patterns():
+    for path in EXAMPLES.glob("*.json"):
+        text = path.read_text(encoding="utf-8").lower()
+
+        for pattern in SECRET_PATTERNS:
+            assert pattern not in text, f"{path} contains secret-like pattern {pattern!r}"
+
+
+def test_example_docs_reference_every_artifact_file():
+    catalog = CATALOG.read_text(encoding="utf-8")
+    sample_report = (EXAMPLES / "sample-ai-diagnosis.md").read_text(encoding="utf-8")
+
+    for filename in EXPECTED_EXAMPLE_FILES:
+        assert filename in catalog
+        assert filename in sample_report
 
 
 def test_example_artifacts_cover_core_qa_failure_modes():
