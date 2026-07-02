@@ -71,6 +71,8 @@ For a stable portfolio example, use:
 reports/examples/sample-ai-diagnosis.md
 ```
 
+To regenerate the committed preview images, see [Screenshot Capture](screenshots.md).
+
 ## What To Show
 
 Use the Failure Mode Matrix as the centerpiece:

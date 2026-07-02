@@ -4,6 +4,8 @@ from pathlib import Path
 
 README = Path("README.md")
 WALKTHROUGH = Path("docs/portfolio-walkthrough.md")
+SCREENSHOTS_DOC = Path("docs/screenshots.md")
+SCREENSHOT_SCRIPT = Path("scripts/capture-portfolio-screenshots.ps1")
 VISUAL_ASSETS = (
     Path("docs/assets/provider-status.png"),
     Path("docs/assets/failure-mode-matrix.png"),
@@ -45,3 +47,19 @@ def test_portfolio_visual_assets_are_documented():
     for asset in VISUAL_ASSETS:
         assert asset.exists()
         assert asset.stat().st_size > 5_000
+
+
+def test_portfolio_screenshot_capture_process_is_documented():
+    walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
+    screenshots_doc = SCREENSHOTS_DOC.read_text(encoding="utf-8")
+    script = SCREENSHOT_SCRIPT.read_text(encoding="utf-8")
+
+    assert "[Screenshot Capture](screenshots.md)" in walkthrough
+    assert "scripts\\capture-portfolio-screenshots.ps1" in screenshots_doc
+    assert "docs/assets/provider-status.png" in screenshots_doc
+    assert "docs/assets/failure-mode-matrix.png" in screenshots_doc
+    assert "demo-provider-key-for-screenshot-only" in script
+    assert "fake key text leaked into Provider Status screenshot" in script
+    assert "tenant.internal.example" in script
+    assert "$LASTEXITCODE" in script
+    assert "Screenshot capture failed" in script
