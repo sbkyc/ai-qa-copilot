@@ -4,9 +4,11 @@ import os
 
 from openai import OpenAI
 
-FALLBACK_REPORT = """## Summary
 
-AI diagnosis was skipped because OPENAI_API_KEY is not configured.
+def fallback_report(reason: str) -> str:
+    return f"""## Summary
+
+AI diagnosis was skipped because {reason}.
 
 ## Suspected root cause
 
@@ -37,12 +39,15 @@ environment issue
 def diagnose_with_ai(prompt: str) -> str:
     api_key = os.getenv("OPENAI_API_KEY", "")
     if not api_key:
-        return FALLBACK_REPORT
+        return fallback_report("OPENAI_API_KEY is not configured")
 
     model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
-    client = OpenAI(api_key=api_key)
-    response = client.responses.create(
-        model=model,
-        input=prompt,
-    )
-    return response.output_text
+    try:
+        client = OpenAI(api_key=api_key)
+        response = client.responses.create(
+            model=model,
+            input=prompt,
+        )
+        return response.output_text
+    except Exception as exc:
+        return fallback_report(str(exc))

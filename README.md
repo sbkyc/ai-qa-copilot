@@ -22,6 +22,8 @@ FastAPI demo shop
   -> GitHub Actions artifacts
 ```
 
+See [docs/architecture.md](docs/architecture.md) for the full architecture and failure diagnosis flow.
+
 ## Local Setup
 
 ```powershell
@@ -76,6 +78,10 @@ python -m qa_copilot.cli --input reports/latest/failures --output reports/latest
 
 - `reports/examples/sample-failure.json`
 - `reports/examples/sample-ai-diagnosis.md`
+
+## For Chinese Interviews
+
+See [docs/resume-zh.md](docs/resume-zh.md) for a Chinese resume description and interview talking points.
 
 ## Resume Description
 

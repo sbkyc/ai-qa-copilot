@@ -22,15 +22,18 @@ def load_failure_artifacts(path: str | Path) -> list[FailureArtifact]:
 
     artifacts: list[FailureArtifact] = []
     for artifact_file in sorted(root.glob("*.json")):
-        payload = json.loads(artifact_file.read_text(encoding="utf-8"))
-        artifacts.append(
-            FailureArtifact(
-                nodeid=str(payload["nodeid"]),
-                failed_at=str(payload["failed_at"]),
-                phase=str(payload["phase"]),
-                duration_seconds=float(payload["duration_seconds"]),
-                longrepr=str(payload["longrepr"]),
-                keywords=[str(keyword) for keyword in payload.get("keywords", [])],
+        try:
+            payload = json.loads(artifact_file.read_text(encoding="utf-8"))
+            artifacts.append(
+                FailureArtifact(
+                    nodeid=str(payload["nodeid"]),
+                    failed_at=str(payload["failed_at"]),
+                    phase=str(payload["phase"]),
+                    duration_seconds=float(payload["duration_seconds"]),
+                    longrepr=str(payload["longrepr"]),
+                    keywords=[str(keyword) for keyword in payload.get("keywords", [])],
+                )
             )
-        )
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+            continue
     return artifacts
