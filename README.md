@@ -13,6 +13,12 @@ AI QA Copilot is a Python portfolio project that combines automated testing and 
 - GitHub Actions CI
 - Optional AI-generated diagnosis reports for failed tests
 
+## Portfolio Walkthrough
+
+For a 3-minute interview path, start with the Provider Status UI, run the bundled diagnosis examples, and show the Failure Mode Matrix in the sample report.
+
+See [Portfolio Walkthrough](docs/portfolio-walkthrough.md) for the step-by-step demo script.
+
 ## Architecture
 
 ```text
