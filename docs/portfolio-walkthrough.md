@@ -29,6 +29,8 @@ username: alice
 password: password123
 ```
 
+These are local demo credentials only; do not reuse them in production.
+
 The products page includes Provider Status. The same provider health data is also available from the redacted API endpoint:
 
 ```powershell
@@ -44,6 +46,8 @@ python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-a
 ```
 
 Without a configured provider key, the command writes a fallback report. With a configured provider, it sends grouped failure context to the provider.
+
+Use a temporary demo key, and avoid sending proprietary logs to third-party providers.
 
 DeepSeek example:
 
