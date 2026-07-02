@@ -124,6 +124,18 @@ def _first_env_value(names: tuple[str, ...]) -> str:
     return ""
 
 
+def supported_provider_specs() -> dict[str, dict[str, object]]:
+    return {
+        name: {
+            "default_model": preset.default_model,
+            "api_style": preset.api_style,
+            "default_base_url": preset.default_base_url,
+            "api_key_env_names": list(preset.api_key_env_names),
+        }
+        for name, preset in sorted(PROVIDER_PRESETS.items())
+    }
+
+
 class OpenAIResponsesProvider:
     def __init__(
         self,

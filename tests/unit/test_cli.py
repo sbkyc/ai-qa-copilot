@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from qa_copilot.cli import generate_report
+from qa_copilot.cli import main as cli_main
 
 
 def test_generate_report_writes_no_artifacts_message(tmp_path):
@@ -37,3 +38,13 @@ def test_generate_report_writes_diagnosis_for_failure_artifact(tmp_path, monkeyp
     report = output.read_text(encoding="utf-8")
     assert "# AI Diagnosis Report" in report
     assert "API key is not configured" in report
+
+
+def test_cli_lists_supported_providers(monkeypatch, capsys):
+    monkeypatch.setattr("sys.argv", ["qa-copilot", "--list-providers"])
+
+    cli_main()
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["deepseek"]["api_style"] == "chat"
+    assert output["openai"]["api_style"] == "responses"

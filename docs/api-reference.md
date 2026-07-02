@@ -108,6 +108,25 @@ Insufficient stock returns HTTP `409`.
 
 ## AI Diagnosis
 
+### `GET /api/ai-providers`
+
+Returns supported AI provider presets without exposing API keys.
+
+Response:
+
+```json
+{
+  "providers": {
+    "deepseek": {
+      "default_model": "deepseek-chat",
+      "api_style": "chat",
+      "default_base_url": "https://api.deepseek.com",
+      "api_key_env_names": ["DEEPSEEK_API_KEY"]
+    }
+  }
+}
+```
+
 ### `POST /api/diagnosis`
 
 Generates a diagnosis report from one failure artifact.

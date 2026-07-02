@@ -114,6 +114,12 @@ The AI call is isolated behind a provider layer, so it can use OpenAI, DeepSeek,
 
 See [docs/api-adapters.md](docs/api-adapters.md) for configuration details.
 
+List supported providers:
+
+```powershell
+python -m qa_copilot.cli --list-providers
+```
+
 ## Diagnosis API Endpoint
 
 The demo app also exposes an API endpoint for generating a diagnosis from failure context:
@@ -127,6 +133,12 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/diagnosis -Content
   "longrepr": "AssertionError: expected 409 but got 500",
   "keywords": ["api", "orders"]
 }'
+```
+
+Supported provider metadata is available at:
+
+```text
+GET /api/ai-providers
 ```
 
 ## Example Artifacts

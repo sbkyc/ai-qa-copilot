@@ -45,6 +45,18 @@ If no API key is configured, the CLI writes a fallback report instead of failing
 
 ## Supported Provider Presets
 
+List the same provider metadata from the CLI:
+
+```powershell
+python -m qa_copilot.cli --list-providers
+```
+
+Or from the demo app:
+
+```text
+GET /api/ai-providers
+```
+
 | Provider | API style | Default base URL | Default model | API key env |
 | --- | --- | --- | --- | --- |
 | `openai` | Responses API | OpenAI default | `gpt-4.1-mini` | `OPENAI_API_KEY` |

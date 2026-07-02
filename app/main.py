@@ -32,6 +32,7 @@ from app.services import (
 from qa_copilot.artifacts import FailureArtifact
 from qa_copilot.diagnosis import diagnose_with_ai
 from qa_copilot.prompt_builder import build_diagnosis_prompt
+from qa_copilot.providers import supported_provider_specs
 
 templates = Jinja2Templates(directory="app/templates")
 
@@ -132,6 +133,10 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         prompt = build_diagnosis_prompt([artifact])
         report = diagnose_with_ai(prompt)
         return DiagnosisResponse(artifact_count=1, report_markdown=report)
+
+    @api.get("/api/ai-providers")
+    def ai_providers() -> dict[str, dict[str, dict[str, object]]]:
+        return {"providers": supported_provider_specs()}
 
     @api.get("/", response_class=HTMLResponse)
     def login_page(request: Request) -> HTMLResponse:

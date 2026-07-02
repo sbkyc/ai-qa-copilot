@@ -5,6 +5,7 @@ from qa_copilot.providers import (
     OpenAICompatibleChatProvider,
     OpenAIResponsesProvider,
     create_diagnosis_provider,
+    supported_provider_specs,
 )
 
 
@@ -129,3 +130,14 @@ def test_create_diagnosis_provider_selects_chat_adapter_for_deepseek():
     provider = create_diagnosis_provider(config)
 
     assert isinstance(provider, OpenAICompatibleChatProvider)
+
+
+def test_supported_provider_specs_exposes_public_provider_metadata():
+    providers = supported_provider_specs()
+
+    deepseek = providers["deepseek"]
+    assert deepseek["api_style"] == "chat"
+    assert deepseek["default_model"] == "deepseek-chat"
+    assert deepseek["default_base_url"] == "https://api.deepseek.com"
+    assert deepseek["api_key_env_names"] == ["DEEPSEEK_API_KEY"]
+    assert "api_key" not in deepseek
