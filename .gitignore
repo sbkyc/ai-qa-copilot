@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+reports/latest/
+test-results/
+playwright-report/
+*.sqlite
+.env
+docs/superpowers/
+outputs/
+work/

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Products</title>
+  </head>
+  <body>
+    <main>
+      <h1>Products</h1>
+      <p>Signed in as {{ username }}</p>
+      {% if error %}
+        <p role="alert">{{ error }}</p>
+      {% endif %}
+      <section aria-label="Product catalog">
+        {% for product in products %}
+          <article>
+            <h2>{{ product.name }}</h2>
+            <p>Price: {{ product.price_cents }} cents</p>
+            <p>Stock: {{ product.stock }}</p>
+            <form method="post" action="/orders">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <label>
+                Quantity
+                <input name="quantity" type="number" value="1" min="1">
+              </label>
+              <button type="submit">Create order</button>
+            </form>
+          </article>
+        {% endfor %}
+      </section>
+    </main>
+  </body>
+</html>
