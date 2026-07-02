@@ -149,6 +149,8 @@ python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-a
 The AI diagnosis feature must not break CI. The CLI writes a fallback Markdown report when:
 
 - `OPENAI_API_KEY` is missing
+- `AI_PROVIDER` is unsupported
+- `AI_API_STYLE` is not `chat` or `responses`
 - the API request times out
 - the provider returns an error
 - the configured gateway is unavailable

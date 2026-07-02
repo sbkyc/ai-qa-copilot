@@ -17,15 +17,20 @@ def _configured_key_source(provider: str) -> str | None:
     return None
 
 
-def check_provider_health(*, include_internal: bool = False) -> dict[str, Any]:
-    config = DiagnosisProviderConfig.from_env()
-    key_source = _configured_key_source(config.provider)
-    missing: list[str] = []
+def validate_provider_config(config: DiagnosisProviderConfig) -> list[str]:
     errors: list[str] = []
     if config.provider not in PROVIDER_PRESETS:
         errors.append("unsupported_provider")
     if config.api_style not in SUPPORTED_API_STYLES:
         errors.append("unsupported_api_style")
+    return errors
+
+
+def check_provider_health(*, include_internal: bool = False) -> dict[str, Any]:
+    config = DiagnosisProviderConfig.from_env()
+    key_source = _configured_key_source(config.provider)
+    missing: list[str] = []
+    errors = validate_provider_config(config)
     if not config.api_key:
         missing.append("api_key")
     if not config.model:
