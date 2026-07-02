@@ -21,3 +21,10 @@ def test_portfolio_walkthrough_covers_demo_story():
     assert "Failure Mode Matrix" in walkthrough
     assert "reports/examples/sample-ai-diagnosis.md" in walkthrough
     assert "DeepSeek" in walkthrough
+
+
+def test_portfolio_walkthrough_mentions_demo_security_boundaries():
+    walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
+
+    assert "local demo credentials only" in walkthrough
+    assert "avoid sending proprietary logs to third-party providers" in walkthrough
