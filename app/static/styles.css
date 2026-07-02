@@ -165,6 +165,114 @@ button:hover,
   margin-bottom: 28px;
 }
 
+.provider-status {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+}
+
+.provider-status-ok {
+  border-color: rgba(17, 124, 111, 0.36);
+}
+
+.provider-status-warning {
+  border-color: rgba(180, 35, 24, 0.32);
+}
+
+.provider-status-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.provider-status h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.provider-status-summary {
+  margin: 6px 0 0;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.provider-status-warning .provider-status-summary {
+  color: var(--danger);
+}
+
+.button-link-secondary {
+  min-height: 36px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.button-link-secondary:hover {
+  border-color: var(--accent);
+  background: var(--surface-soft);
+  color: var(--accent-dark);
+}
+
+.provider-status-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.provider-status-meta div {
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--surface-soft);
+}
+
+.provider-status-meta dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.provider-status-meta dd {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.provider-issues {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.provider-issues li {
+  display: grid;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid rgba(180, 35, 24, 0.22);
+  border-radius: 6px;
+  background: #fff8f6;
+  color: var(--text);
+}
+
+.provider-issues strong {
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.provider-issues span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -238,5 +346,18 @@ button:hover,
 
   .product-grid {
     grid-template-columns: 1fr;
+  }
+
+  .provider-status-header,
+  .provider-status-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .provider-status-header {
+    display: grid;
+  }
+
+  .button-link-secondary {
+    width: 100%;
   }
 }
