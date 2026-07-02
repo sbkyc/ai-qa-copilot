@@ -51,10 +51,20 @@ List the same provider metadata from the CLI:
 python -m qa_copilot.cli --list-providers
 ```
 
+Check the current provider configuration:
+
+```powershell
+python -m qa_copilot.cli --check-provider
+```
+
 Or from the demo app:
 
 ```text
 GET /api/ai-providers
+```
+
+```text
+GET /api/provider-health
 ```
 
 | Provider | API style | Default base URL | Default model | API key env |

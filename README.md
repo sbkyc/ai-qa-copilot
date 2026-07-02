@@ -120,6 +120,12 @@ List supported providers:
 python -m qa_copilot.cli --list-providers
 ```
 
+Check the current provider configuration:
+
+```powershell
+python -m qa_copilot.cli --check-provider
+```
+
 ## Diagnosis API Endpoint
 
 The demo app also exposes an API endpoint for generating a diagnosis from failure context:
@@ -139,6 +145,12 @@ Supported provider metadata is available at:
 
 ```text
 GET /api/ai-providers
+```
+
+Current provider configuration health is available at:
+
+```text
+GET /api/provider-health
 ```
 
 ## Example Artifacts

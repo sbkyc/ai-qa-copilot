@@ -48,3 +48,16 @@ def test_cli_lists_supported_providers(monkeypatch, capsys):
     output = json.loads(capsys.readouterr().out)
     assert output["deepseek"]["api_style"] == "chat"
     assert output["openai"]["api_style"] == "responses"
+
+
+def test_cli_checks_provider_configuration(monkeypatch, capsys):
+    monkeypatch.setattr("sys.argv", ["qa-copilot", "--check-provider"])
+    monkeypatch.setenv("AI_PROVIDER", "deepseek")
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "secret-deepseek-key")
+
+    cli_main()
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["ok"] is True
+    assert output["provider"] == "deepseek"
+    assert "secret-deepseek-key" not in str(output)

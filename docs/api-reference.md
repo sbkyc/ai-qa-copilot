@@ -127,6 +127,25 @@ Response:
 }
 ```
 
+### `GET /api/provider-health`
+
+Returns the current provider configuration status without exposing API keys.
+
+Response:
+
+```json
+{
+  "ok": true,
+  "provider": "deepseek",
+  "model": "deepseek-chat",
+  "base_url": "https://api.deepseek.com",
+  "api_style": "chat",
+  "api_key_configured": true,
+  "api_key_source": "DEEPSEEK_API_KEY",
+  "missing": []
+}
+```
+
 ### `POST /api/diagnosis`
 
 Generates a diagnosis report from one failure artifact.
