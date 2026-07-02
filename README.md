@@ -74,6 +74,16 @@ $env:OPENAI_API_KEY="your-api-key"
 python -m qa_copilot.cli --input reports/latest/failures --output reports/latest/ai-diagnosis.md
 ```
 
+## Demo Failure Flow
+
+To generate a diagnosis report from the bundled sample failure artifact:
+
+```powershell
+python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
+```
+
+See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
+
 ## Example Artifacts
 
 - `reports/examples/sample-failure.json`
