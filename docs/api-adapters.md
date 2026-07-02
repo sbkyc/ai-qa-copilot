@@ -77,6 +77,8 @@ GET /api/provider-health
 
 The API health response is redacted for safe use in demos and future UI panels. It returns status fields such as `ok`, `provider`, `api_style`, `api_key_configured`, `missing`, and `errors`, but it does not expose model names, custom base URLs, or key environment variable names.
 
+The demo products page renders the same redacted health status so the UI and diagnosis runtime share one view of provider readiness.
+
 Known provider health errors:
 
 - `unsupported_provider`: `AI_PROVIDER` is not one of the supported presets.

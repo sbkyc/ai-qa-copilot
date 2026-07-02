@@ -14,6 +14,11 @@ def test_user_can_login_and_create_order(page: Page, live_server: str):
     page.get_by_role("button", name="Sign in").click()
 
     expect(page.get_by_role("heading", name="Products")).to_be_visible()
+    provider_status = page.get_by_role("region", name="Provider Status")
+    expect(provider_status.get_by_role("heading", name="Provider Status")).to_be_visible()
+    expect(provider_status.locator(".provider-status-summary")).to_have_text(
+        "Missing API key"
+    )
     first_product = page.get_by_role("article").filter(has_text="Wireless Mouse")
     first_product.get_by_role("button", name="Create order").click()
 

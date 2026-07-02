@@ -14,6 +14,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_app
+from tests.helpers import PROVIDER_ENV_NAMES
 
 REPORT_ROOT = Path("reports/latest")
 FAILURE_ROOT = REPORT_ROOT / "failures"
@@ -62,6 +63,8 @@ def live_server(tmp_path_factory: pytest.TempPathFactory):
     db_path = tmp_path_factory.mktemp("e2e-db") / "shop.sqlite"
     env = os.environ.copy()
     env["AI_QA_DB_PATH"] = str(db_path)
+    for name in PROVIDER_ENV_NAMES:
+        env.pop(name, None)
     process = subprocess.Popen(
         [
             sys.executable,

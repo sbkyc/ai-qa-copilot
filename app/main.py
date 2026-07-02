@@ -38,6 +38,22 @@ from qa_copilot.providers import supported_provider_specs
 
 templates = Jinja2Templates(directory="app/templates")
 
+PROVIDER_ISSUE_LABELS = {
+    "api_key": "Missing API key",
+    "base_url": "Missing base URL",
+    "model": "Missing model",
+    "unsupported_provider": "Unsupported provider",
+    "unsupported_api_style": "Unsupported API style",
+}
+
+PROVIDER_ISSUE_HINTS = {
+    "api_key": "Set AI_API_KEY or a provider-specific key.",
+    "base_url": "Add AI_BASE_URL for OpenAI-compatible gateways.",
+    "model": "Set AI_MODEL for the selected provider.",
+    "unsupported_provider": "Check the AI_PROVIDER spelling.",
+    "unsupported_api_style": "Use AI_API_STYLE=chat or AI_API_STYLE=responses.",
+}
+
 
 def _resolve_db_path(db_path: str | Path | None) -> str | Path:
     if db_path is not None:
@@ -49,6 +65,28 @@ def _extract_bearer_token(authorization: str | None) -> str:
     if authorization is None or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing bearer token")
     return authorization.removeprefix("Bearer ").strip()
+
+
+def _provider_health_view_model() -> dict[str, object]:
+    health = check_provider_health()
+    missing = [str(item) for item in health["missing"]]
+    errors = [str(item) for item in health["errors"]]
+    issue_codes = [*errors, *missing]
+    issues = [
+        {
+            "label": PROVIDER_ISSUE_LABELS.get(code, code.replace("_", " ").title()),
+            "hint": PROVIDER_ISSUE_HINTS.get(code, "Review the provider environment."),
+        }
+        for code in issue_codes
+    ]
+    return {
+        "ok": health["ok"],
+        "provider": health["provider"],
+        "api_style": health["api_style"],
+        "api_key_configured": health["api_key_configured"],
+        "status_label": "Ready" if health["ok"] else issues[0]["label"],
+        "issues": issues,
+    }
 
 
 def create_app(db_path: str | Path | None = None) -> FastAPI:
@@ -79,6 +117,18 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             return username_from_token(token)
         except AuthenticationError as exc:
             raise HTTPException(status_code=401, detail=str(exc)) from exc
+
+    def products_context(
+        username: str,
+        db: sqlite3.Connection,
+        error: str = "",
+    ) -> dict[str, object]:
+        return {
+            "username": username,
+            "products": list_products(db),
+            "error": error,
+            "provider_health": _provider_health_view_model(),
+        }
 
     DbConnection = Annotated[sqlite3.Connection, Depends(get_db)]
     CurrentUsername = Annotated[str, Depends(current_username)]
@@ -180,7 +230,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         return templates.TemplateResponse(
             request,
             "products.html",
-            {"username": username, "products": list_products(db), "error": ""},
+            products_context(username, db),
         )
 
     @api.post("/orders", response_model=None)
@@ -200,11 +250,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             return templates.TemplateResponse(
                 request,
                 "products.html",
-                {
-                    "username": username,
-                    "products": list_products(db),
-                    "error": str(exc),
-                },
+                products_context(username, db, str(exc)),
                 status_code=409,
             )
         return templates.TemplateResponse(
