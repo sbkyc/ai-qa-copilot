@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from qa_copilot.providers import DiagnosisProvider, DiagnosisProviderConfig, OpenAIResponsesProvider
+from qa_copilot.providers import (
+    DiagnosisProvider,
+    DiagnosisProviderConfig,
+    create_diagnosis_provider,
+)
 
 
 def fallback_report(reason: str) -> str:
@@ -41,10 +45,10 @@ def diagnose_with_ai(
 ) -> str:
     resolved_config = config or DiagnosisProviderConfig.from_env()
     if not resolved_config.api_key:
-        return fallback_report("OPENAI_API_KEY is not configured")
+        return fallback_report("API key is not configured")
 
     try:
-        resolved_provider = provider or OpenAIResponsesProvider(resolved_config)
+        resolved_provider = provider or create_diagnosis_provider(resolved_config)
         return resolved_provider.generate(prompt)
     except Exception as exc:
         return fallback_report(str(exc))

@@ -24,34 +24,86 @@ qa_copilot/diagnosis.py
 
 This keeps failure handling and fallback behavior separate from API transport details.
 
-## Environment Variables
+## Recommended Environment Variables
 
 ```dotenv
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4.1-mini
-OPENAI_BASE_URL=
+AI_PROVIDER=openai
+AI_API_KEY=
+AI_MODEL=
+AI_BASE_URL=
 ```
 
-`OPENAI_API_KEY` is optional for local demo runs. If it is empty, the CLI writes a fallback report instead of failing.
+`AI_PROVIDER` selects the provider preset.
 
-`OPENAI_MODEL` controls the model used by the Responses API adapter.
+`AI_API_KEY` is the generic API key. Provider-specific keys are also supported.
 
-`OPENAI_BASE_URL` is optional. Use it only when routing through an OpenAI-compatible gateway or proxy.
+`AI_MODEL` overrides the preset default model.
+
+`AI_BASE_URL` overrides the preset base URL.
+
+If no API key is configured, the CLI writes a fallback report instead of failing.
+
+## Supported Provider Presets
+
+| Provider | API style | Default base URL | Default model | API key env |
+| --- | --- | --- | --- | --- |
+| `openai` | Responses API | OpenAI default | `gpt-4.1-mini` | `OPENAI_API_KEY` |
+| `deepseek` | Chat Completions | `https://api.deepseek.com` | `deepseek-chat` | `DEEPSEEK_API_KEY` |
+| `qwen` / `dashscope` | Chat Completions | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-plus` | `DASHSCOPE_API_KEY` or `QWEN_API_KEY` |
+| `kimi` / `moonshot` | Chat Completions | `https://api.moonshot.cn/v1` | `kimi-k2-0711-preview` | `MOONSHOT_API_KEY` or `KIMI_API_KEY` |
+| `siliconflow` | Chat Completions | `https://api.siliconflow.cn/v1` | `deepseek-ai/DeepSeek-V3` | `SILICONFLOW_API_KEY` |
+| `openrouter` | Chat Completions | `https://openrouter.ai/api/v1` | `deepseek/deepseek-chat-v3.1` | `OPENROUTER_API_KEY` |
+| `doubao` | Chat Completions | `https://ark.cn-beijing.volces.com/api/v3` | `doubao-seed-1-6` | `ARK_API_KEY`, `VOLCENGINE_API_KEY`, or `DOUBAO_API_KEY` |
+| `openai-compatible` | Chat Completions | set `AI_BASE_URL` | set `AI_MODEL` | `AI_API_KEY` |
 
 ## OpenAI Example
 
 ```powershell
-$env:OPENAI_API_KEY="your-api-key"
-$env:OPENAI_MODEL="gpt-4.1-mini"
+$env:AI_PROVIDER="openai"
+$env:AI_API_KEY="your-openai-key"
+$env:AI_MODEL="gpt-4.1-mini"
 python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
 ```
 
-## OpenAI-Compatible Gateway Example
+## DeepSeek Example
 
 ```powershell
-$env:OPENAI_API_KEY="gateway-key"
-$env:OPENAI_MODEL="your-routed-model"
-$env:OPENAI_BASE_URL="https://gateway.example.com/v1"
+$env:AI_PROVIDER="deepseek"
+$env:DEEPSEEK_API_KEY="your-deepseek-key"
+python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
+```
+
+## Qwen / DashScope Example
+
+```powershell
+$env:AI_PROVIDER="qwen"
+$env:DASHSCOPE_API_KEY="your-dashscope-key"
+python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
+```
+
+## Kimi / Moonshot Example
+
+```powershell
+$env:AI_PROVIDER="kimi"
+$env:MOONSHOT_API_KEY="your-moonshot-key"
+python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
+```
+
+## OpenRouter Example
+
+```powershell
+$env:AI_PROVIDER="openrouter"
+$env:OPENROUTER_API_KEY="your-openrouter-key"
+python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
+```
+
+## Custom OpenAI-Compatible Gateway Example
+
+```powershell
+$env:AI_PROVIDER="openai-compatible"
+$env:AI_API_KEY="gateway-key"
+$env:AI_MODEL="your-routed-model"
+$env:AI_BASE_URL="https://gateway.example.com/v1"
 python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
 ```
 
@@ -92,7 +144,7 @@ Response body:
 }
 ```
 
-This endpoint uses the same provider layer as the CLI, so it supports the same `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_BASE_URL` environment variables.
+This endpoint uses the same provider layer as the CLI, so it supports the same provider presets and environment variables.
 
 ## Adding Another Provider
 

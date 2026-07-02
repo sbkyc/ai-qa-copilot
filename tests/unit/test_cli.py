@@ -36,4 +36,4 @@ def test_generate_report_writes_diagnosis_for_failure_artifact(tmp_path, monkeyp
 
     report = output.read_text(encoding="utf-8")
     assert "# AI Diagnosis Report" in report
-    assert "OPENAI_API_KEY is not configured" in report
+    assert "API key is not configured" in report

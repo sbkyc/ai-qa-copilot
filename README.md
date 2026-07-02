@@ -90,6 +90,14 @@ $env:OPENAI_API_KEY="your-api-key"
 python -m qa_copilot.cli --input reports/latest/failures --output reports/latest/ai-diagnosis.md
 ```
 
+With DeepSeek:
+
+```powershell
+$env:AI_PROVIDER="deepseek"
+$env:DEEPSEEK_API_KEY="your-deepseek-key"
+python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
+```
+
 ## Demo Failure Flow
 
 To generate a diagnosis report from the bundled sample failure artifact:
@@ -102,7 +110,7 @@ See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
 
 ## AI API Adapter
 
-The AI call is isolated behind a provider layer, so it can use OpenAI directly or an OpenAI-compatible gateway through environment variables.
+The AI call is isolated behind a provider layer, so it can use OpenAI, DeepSeek, Qwen/DashScope, Kimi/Moonshot, SiliconFlow, OpenRouter, Doubao, or any OpenAI-compatible gateway through environment variables.
 
 See [docs/api-adapters.md](docs/api-adapters.md) for configuration details.
 
