@@ -67,6 +67,12 @@ password: password123
 pytest -q --browser chromium --tracing retain-on-failure --screenshot only-on-failure
 ```
 
+## Run Full Local Verification
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/verify.ps1
+```
+
 ## Generate AI Diagnosis
 
 Without `OPENAI_API_KEY`, the command writes a fallback report:
