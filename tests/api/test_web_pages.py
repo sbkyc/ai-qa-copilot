@@ -3,6 +3,11 @@ from __future__ import annotations
 from tests.helpers import clear_provider_env
 
 
+def get_signed_in_products_page(client):
+    client.cookies.set("qa_user", "alice")
+    return client.get("/products")
+
+
 def test_login_page_renders(client):
     response = client.get("/")
 
@@ -41,9 +46,8 @@ def test_products_page_shows_redacted_provider_status(client, monkeypatch):
     monkeypatch.setenv("AI_API_KEY", "fake-gateway-key")
     monkeypatch.setenv("AI_MODEL", "tenant-routed-model")
     monkeypatch.setenv("AI_BASE_URL", "https://tenant.internal.example/v1")
-    client.cookies.set("qa_user", "alice")
 
-    response = client.get("/products")
+    response = get_signed_in_products_page(client)
 
     assert response.status_code == 200
     assert "Provider Status" in response.text
@@ -60,11 +64,39 @@ def test_products_page_shows_missing_base_url_provider_status(client, monkeypatc
     clear_provider_env(monkeypatch)
     monkeypatch.setenv("AI_PROVIDER", "openai-compatible")
     monkeypatch.setenv("AI_API_KEY", "fake-gateway-key")
-    client.cookies.set("qa_user", "alice")
 
-    response = client.get("/products")
+    response = get_signed_in_products_page(client)
 
     assert response.status_code == 200
     assert "Provider Status" in response.text
     assert "Missing base URL" in response.text
     assert "Add AI_BASE_URL for OpenAI-compatible gateways." in response.text
+
+
+def test_products_page_shows_unsupported_provider_status(client, monkeypatch):
+    clear_provider_env(monkeypatch)
+    monkeypatch.setenv("AI_PROVIDER", "deepssek")
+    monkeypatch.setenv("AI_API_KEY", "fake-key")
+
+    response = get_signed_in_products_page(client)
+
+    assert response.status_code == 200
+    assert "Provider Status" in response.text
+    assert "Unsupported provider" in response.text
+    assert "Check the AI_PROVIDER spelling." in response.text
+    assert "fake-key" not in response.text
+
+
+def test_products_page_shows_unsupported_api_style_status(client, monkeypatch):
+    clear_provider_env(monkeypatch)
+    monkeypatch.setenv("AI_PROVIDER", "deepseek")
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-deepseek-key")
+    monkeypatch.setenv("AI_API_STYLE", "chta")
+
+    response = get_signed_in_products_page(client)
+
+    assert response.status_code == 200
+    assert "Provider Status" in response.text
+    assert "Unsupported API style" in response.text
+    assert "Use AI_API_STYLE=chat or AI_API_STYLE=responses." in response.text
+    assert "fake-deepseek-key" not in response.text
