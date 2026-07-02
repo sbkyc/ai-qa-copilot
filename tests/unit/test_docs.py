@@ -61,3 +61,5 @@ def test_portfolio_screenshot_capture_process_is_documented():
     assert "demo-provider-key-for-screenshot-only" in script
     assert "fake key text leaked into Provider Status screenshot" in script
     assert "tenant.internal.example" in script
+    assert "$LASTEXITCODE" in script
+    assert "Screenshot capture failed" in script

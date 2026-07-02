@@ -213,6 +213,9 @@ print("wrote docs/assets/failure-mode-matrix.png")
 '@
 
     $python | python - $Port
+    if ($LASTEXITCODE -ne 0) {
+        throw "Screenshot capture failed with exit code $LASTEXITCODE"
+    }
 } finally {
     if ($server) {
         Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
