@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import os
-
-from openai import OpenAI
+from qa_copilot.providers import DiagnosisProvider, DiagnosisProviderConfig, OpenAIResponsesProvider
 
 
 def fallback_report(reason: str) -> str:
@@ -36,18 +34,17 @@ environment issue
 """
 
 
-def diagnose_with_ai(prompt: str) -> str:
-    api_key = os.getenv("OPENAI_API_KEY", "")
-    if not api_key:
+def diagnose_with_ai(
+    prompt: str,
+    provider: DiagnosisProvider | None = None,
+    config: DiagnosisProviderConfig | None = None,
+) -> str:
+    resolved_config = config or DiagnosisProviderConfig.from_env()
+    if not resolved_config.api_key:
         return fallback_report("OPENAI_API_KEY is not configured")
 
-    model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
     try:
-        client = OpenAI(api_key=api_key)
-        response = client.responses.create(
-            model=model,
-            input=prompt,
-        )
-        return response.output_text
+        resolved_provider = provider or OpenAIResponsesProvider(resolved_config)
+        return resolved_provider.generate(prompt)
     except Exception as exc:
         return fallback_report(str(exc))

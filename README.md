@@ -98,6 +98,12 @@ python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-a
 
 See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
 
+## AI API Adapter
+
+The AI call is isolated behind a provider layer, so it can use OpenAI directly or an OpenAI-compatible gateway through environment variables.
+
+See [docs/api-adapters.md](docs/api-adapters.md) for configuration details.
+
 ## Example Artifacts
 
 - `reports/examples/sample-failure.json`
