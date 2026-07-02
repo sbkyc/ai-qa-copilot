@@ -70,3 +70,23 @@ def test_diagnose_with_ai_rejects_invalid_api_style_before_creating_provider(mon
     assert "AI diagnosis was skipped" in report
     assert "unsupported_api_style" in report
     assert "provider should not be created" not in report
+
+
+def test_diagnose_with_ai_rejects_missing_base_url_before_creating_provider(monkeypatch):
+    clear_provider_env(monkeypatch)
+    monkeypatch.setenv("AI_PROVIDER", "openai-compatible")
+    monkeypatch.setenv("AI_API_KEY", "fake-gateway-key")
+
+    def fail_if_created(*args, **kwargs):
+        raise AssertionError("provider should not be created")
+
+    monkeypatch.setattr(
+        "qa_copilot.diagnosis.create_diagnosis_provider",
+        fail_if_created,
+    )
+
+    report = diagnose_with_ai("failure prompt")
+
+    assert "AI diagnosis was skipped" in report
+    assert "base_url" in report
+    assert "provider should not be created" not in report

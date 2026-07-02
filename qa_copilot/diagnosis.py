@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from qa_copilot.provider_health import validate_provider_config
+from qa_copilot.provider_health import provider_config_issues
 from qa_copilot.providers import (
     DiagnosisProvider,
     DiagnosisProviderConfig,
@@ -45,11 +45,13 @@ def diagnose_with_ai(
     config: DiagnosisProviderConfig | None = None,
 ) -> str:
     resolved_config = config or DiagnosisProviderConfig.from_env()
-    config_errors = validate_provider_config(resolved_config)
+    missing_config, config_errors = provider_config_issues(resolved_config)
     if config_errors:
         return fallback_report(", ".join(config_errors))
-    if not resolved_config.api_key:
+    if "api_key" in missing_config:
         return fallback_report("API key is not configured")
+    if missing_config:
+        return fallback_report(f"provider config is missing: {', '.join(missing_config)}")
 
     try:
         resolved_provider = provider or create_diagnosis_provider(resolved_config)

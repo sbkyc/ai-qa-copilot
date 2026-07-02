@@ -151,6 +151,7 @@ The AI diagnosis feature must not break CI. The CLI writes a fallback Markdown r
 - `OPENAI_API_KEY` is missing
 - `AI_PROVIDER` is unsupported
 - `AI_API_STYLE` is not `chat` or `responses`
+- a chat-style provider such as `openai-compatible` is missing `AI_BASE_URL`
 - the API request times out
 - the provider returns an error
 - the configured gateway is unavailable
