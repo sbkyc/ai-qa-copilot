@@ -4,6 +4,10 @@ from pathlib import Path
 
 README = Path("README.md")
 WALKTHROUGH = Path("docs/portfolio-walkthrough.md")
+VISUAL_ASSETS = (
+    Path("docs/assets/provider-status.png"),
+    Path("docs/assets/failure-mode-matrix.png"),
+)
 
 
 def test_readme_links_portfolio_walkthrough():
@@ -28,3 +32,16 @@ def test_portfolio_walkthrough_mentions_demo_security_boundaries():
 
     assert "local demo credentials only" in walkthrough
     assert "avoid sending proprietary logs to third-party providers" in walkthrough
+
+
+def test_portfolio_visual_assets_are_documented():
+    readme = README.read_text(encoding="utf-8")
+    walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
+
+    assert "docs/assets/provider-status.png" in readme
+    assert "docs/assets/failure-mode-matrix.png" in readme
+    assert "assets/provider-status.png" in walkthrough
+    assert "assets/failure-mode-matrix.png" in walkthrough
+    for asset in VISUAL_ASSETS:
+        assert asset.exists()
+        assert asset.stat().st_size > 5_000

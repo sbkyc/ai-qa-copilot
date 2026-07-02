@@ -19,6 +19,12 @@ For a 3-minute interview path, start with the Provider Status UI, run the bundle
 
 See [Portfolio Walkthrough](docs/portfolio-walkthrough.md) for the step-by-step demo script.
 
+## Visual Preview
+
+![Provider Status card](docs/assets/provider-status.png)
+
+![Failure Mode Matrix](docs/assets/failure-mode-matrix.png)
+
 ## Architecture
 
 ```text

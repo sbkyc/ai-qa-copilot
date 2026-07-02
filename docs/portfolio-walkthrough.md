@@ -33,6 +33,8 @@ These are local demo credentials only; do not reuse them in production.
 
 The products page includes Provider Status. The same provider health data is also available from the redacted API endpoint:
 
+![Provider Status card](assets/provider-status.png)
+
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8000/api/provider-health
 ```
@@ -72,6 +74,8 @@ reports/examples/sample-ai-diagnosis.md
 ## What To Show
 
 Use the Failure Mode Matrix as the centerpiece:
+
+![Failure Mode Matrix](assets/failure-mode-matrix.png)
 
 | Failure Mode | What It Demonstrates |
 | --- | --- |
