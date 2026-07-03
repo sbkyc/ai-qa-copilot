@@ -12,6 +12,7 @@ INTERVIEW_WALKTHROUGH_ZH = Path("docs/interview-walkthrough-zh.md")
 DEMO_FLOW = Path("docs/demo-flow.md")
 SAMPLE_PR_COMMENT = Path("reports/examples/sample-pr-comment.md")
 CI_WORKFLOW = Path(".github/workflows/ci.yml")
+DEMO_WORKFLOW = Path(".github/workflows/demo-artifacts.yml")
 CI_ARTIFACTS_DOC = Path("docs/ci-artifacts.md")
 VISUAL_ASSETS = (
     Path("docs/assets/provider-status.png"),
@@ -280,3 +281,60 @@ def test_ci_artifacts_guide_explains_safety_boundary():
     assert "traces" in text
     assert "Review artifacts" in text
     assert "proprietary systems" in text
+
+
+def test_demo_artifacts_workflow_is_manual_only():
+    workflow = DEMO_WORKFLOW.read_text(encoding="utf-8")
+
+    assert "workflow_dispatch:" in workflow
+    assert "pull_request_target" not in workflow
+    assert "pull_request:" not in workflow
+    assert "push:" not in workflow
+
+
+def test_demo_artifacts_workflow_uses_read_only_permissions():
+    workflow = DEMO_WORKFLOW.read_text(encoding="utf-8")
+
+    assert "permissions:" in workflow
+    assert "contents: read" in workflow
+    assert "persist-credentials: false" in workflow
+
+
+def test_demo_artifacts_workflow_stays_dry_run():
+    workflow = DEMO_WORKFLOW.read_text(encoding="utf-8")
+
+    for phrase in (
+        "GITHUB_TOKEN",
+        "secrets.",
+        "GH_TOKEN",
+        "github-script",
+        "createComment",
+        "gh pr comment",
+        "gh api",
+        "issues: write",
+        "pull-requests: write",
+    ):
+        assert phrase not in workflow
+
+
+def test_demo_artifacts_workflow_uses_curated_examples():
+    workflow = DEMO_WORKFLOW.read_text(encoding="utf-8")
+
+    assert "reports/examples" in workflow
+    assert "sample-ai-diagnosis.md" in workflow
+    assert "reports/demo" in workflow
+    assert "demo-qa-reports" in workflow
+    assert "python -m qa_copilot.pr_comment" in workflow
+
+
+def test_docs_explain_manual_demo_artifact_boundary():
+    readme = README.read_text(encoding="utf-8")
+    ci_artifacts = CI_ARTIFACTS_DOC.read_text(encoding="utf-8")
+    combined = "\n".join((readme, ci_artifacts))
+
+    assert "workflow_dispatch" in combined
+    assert "demo-qa-reports" in combined
+    assert "curated" in combined
+    assert "does not post a real PR comment" in combined
+    assert "does not call the GitHub API" in combined
+    assert "Review artifacts" in combined
