@@ -8,6 +8,12 @@ Open the latest GitHub Actions run, scroll to **Artifacts**, and download `qa-re
 
 The artifact is produced from the repository's `reports/` directory after the workflow runs tests, generates an AI diagnosis report, and creates a dry-run PR comment preview.
 
+For a stable portfolio demo, use the **Demo Artifacts** workflow from the GitHub Actions tab. It is started manually with `workflow_dispatch` and uploads `demo-qa-reports`.
+
+`demo-qa-reports` is a curated demo artifact built from `reports/examples` and `reports/examples/sample-ai-diagnosis.md`. It is useful for interviews because it always includes example failure JSON, an AI diagnosis sample, and a dry-run PR comment preview without requiring a failing CI run.
+
+The manual demo workflow does not call the GitHub API, does not post a real PR comment, and does not use repository secrets or external AI provider keys.
+
 ## What is inside
 
 | File | Purpose | Interview talking point |
@@ -32,6 +38,18 @@ pytest / Playwright
 ```
 
 The main interview message is that the project does more than run tests. It preserves test evidence, converts failure artifacts into an AI diagnosis, and prepares a review-friendly PR comment preview without posting to GitHub automatically.
+
+For the manual demo artifact, be explicit that it is curated sample data:
+
+```text
+reports/examples
+-> reports/demo/failures
+-> reports/demo/ai-diagnosis.md
+-> reports/demo/pr-comment.md
+-> demo-qa-reports artifact
+```
+
+Use `qa-reports` to discuss real CI output. Use `demo-qa-reports` when you want a reproducible portfolio walkthrough from curated examples.
 
 ## Safety boundary
 
