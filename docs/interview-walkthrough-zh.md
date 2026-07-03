@@ -6,6 +6,23 @@
 
 我想展示的不是“会写几条测试”，而是能把被测系统、测试框架、CI、失败产物、LLM provider、安全脱敏和面试展示串成完整工程闭环。
 
+## 本地演示顺序
+
+面试时我会按这个顺序演示：
+
+1. 先打开 Dashboard：`http://127.0.0.1:8000`，用 30 秒讲清平台能力。
+2. 点击“进入 Demo Shop”，登录 `alice / password123`。
+3. 创建一笔订单，说明 Demo Shop 是真实被测业务系统。
+4. 在订单成功页解释：下单成功不是终点，它只是 E2E 测试场景。
+5. 如果这个流程失败，项目会把失败整理成 failure JSON、AI diagnosis 和 `pr-comment.md`。
+6. 最后打开 `qa-reports` 或 `reports/examples/sample-ai-diagnosis.md`，讲 Failure Mode Matrix。
+
+这条线可以总结成：
+
+```text
+Dashboard -> Demo Shop 下单 -> failure artifacts -> AI diagnosis -> PR comment preview -> qa-reports
+```
+
 ## 技术栈
 
 - Python

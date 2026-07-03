@@ -18,6 +18,8 @@ For a 3-minute interview path, start with the Chinese Showcase Dashboard at `/`,
 
 See [Portfolio Walkthrough](docs/portfolio-walkthrough.md) for the step-by-step demo script.
 
+For a Chinese talk track you can read before interviews, see [中文面试演示脚本](docs/interview-demo-script-zh.md).
+
 ## Visual Preview
 
 ![Provider Status card](docs/assets/provider-status.png)
@@ -225,6 +227,8 @@ See [docs/resume-zh.md](docs/resume-zh.md) for a Chinese resume description and 
 See [docs/interview-qa.md](docs/interview-qa.md) for interview questions and suggested answers.
 
 See [docs/interview-walkthrough-zh.md](docs/interview-walkthrough-zh.md) for a 3-minute Chinese interview walkthrough.
+
+See [docs/interview-demo-script-zh.md](docs/interview-demo-script-zh.md) for a Chinese demo script that explains Dashboard -> Demo Shop order -> QA reports.
 
 ## Resume Description
 

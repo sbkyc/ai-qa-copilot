@@ -4,12 +4,15 @@ This walkthrough is the shortest path for showing AI QA Copilot in an interview 
 
 ## 3-Minute Interview Path
 
-1. Open the FastAPI demo shop and log in with the demo account.
-2. Point out the Provider Status card: it shows readiness without exposing API keys, model names, key source environment variables, or custom base URLs.
-3. Run the bundled failure examples through the CLI.
-4. Open the generated report or the curated sample report.
-5. Explain the Failure Mode Matrix: it separates product/API bugs, contract drift, UI/E2E failures, flaky timing, and environment/setup failures.
-6. Optionally open the PR comment preview to show how the diagnosis could fit a code review workflow.
+1. Open the Chinese Showcase Dashboard at `/`.
+2. Explain the visible project path: Dashboard -> Demo Shop order -> QA reports -> AI diagnosis -> dry-run PR comment preview.
+3. Enter the Demo Shop, log in with the demo account, and create an order.
+4. Use the order-success page to explain that the shop is the system under test, not the final product goal.
+5. Point out the Provider Status card: it shows readiness without exposing API keys, model names, key source environment variables, or custom base URLs.
+6. Run the bundled failure examples through the CLI.
+7. Open the generated report or the curated sample report.
+8. Explain the Failure Mode Matrix: it separates product/API bugs, contract drift, UI/E2E failures, flaky timing, and environment/setup failures.
+9. Optionally open the PR comment preview to show how the diagnosis could fit a code review workflow.
 
 ## Run The Demo App
 
@@ -38,6 +41,19 @@ The products page includes Provider Status. The same provider health data is als
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8000/api/provider-health
+```
+
+## What Happens After Buying A Product
+
+The order flow is intentionally small. It exists as the system under test for API and Playwright E2E automation.
+
+When the order succeeds, the success page explains the next step: the order path proves the demo system can be exercised by a browser test. If login, product loading, inventory, or order creation fails, the project can preserve the failure as structured evidence and turn it into a diagnosis report.
+
+The interview message is:
+
+```text
+Buying a product is not the product goal.
+It is the real business path used to demonstrate automated testing and failure diagnosis.
 ```
 
 ## Generate A Diagnosis Demo
