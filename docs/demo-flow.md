@@ -16,6 +16,20 @@ Then open:
 Get-Content reports/latest/demo-ai-diagnosis.md
 ```
 
+You can also generate a dry-run PR comment preview from the curated diagnosis report:
+
+```powershell
+python -m qa_copilot.pr_comment --input reports/examples/sample-ai-diagnosis.md --output reports/latest/demo-pr-comment.md
+```
+
+The committed preview is available at:
+
+```text
+reports/examples/sample-pr-comment.md
+```
+
+This preview is Markdown only. It does not call the GitHub API, does not need `GITHUB_TOKEN`, and does not post a real PR comment.
+
 If `OPENAI_API_KEY` is not configured, the command writes a fallback report. This is intentional: the automation workflow should still complete even when AI access is unavailable.
 
 If `OPENAI_API_KEY` is configured, the same command sends the sample failure context to the configured OpenAI model and writes a generated diagnosis report.
@@ -49,3 +63,11 @@ python -m qa_copilot.cli --input reports/latest/failures --output reports/latest
 ```
 
 The resulting report is uploaded with the rest of the test artifacts.
+
+A future workflow can reuse the PR comment preview generator:
+
+```powershell
+python -m qa_copilot.pr_comment --input reports/latest/ai-diagnosis.md --output reports/latest/pr-comment.md
+```
+
+Posting that Markdown to GitHub is intentionally out of scope for the current demo.
