@@ -140,6 +140,8 @@ See [docs/diagnosis-examples.md](docs/diagnosis-examples.md) for the curated Pla
 
 GitHub Actions uploads a `qa-reports` artifact for each CI run. It includes the pytest HTML report, structured failure JSON, AI diagnosis report, and dry-run PR comment preview.
 
+For portfolio demos, the `Demo Artifacts` workflow can be started manually with `workflow_dispatch`. It builds a curated `demo-qa-reports` artifact from `reports/examples`, does not call the GitHub API, and does not post a real PR comment.
+
 See [CI Artifacts](docs/ci-artifacts.md) for the file-by-file guide.
 
 ## AI API Adapter
