@@ -10,6 +10,7 @@ RESUME_ZH = Path("docs/resume-zh.md")
 INTERVIEW_QA_ZH = Path("docs/interview-qa.md")
 INTERVIEW_WALKTHROUGH_ZH = Path("docs/interview-walkthrough-zh.md")
 INTERVIEW_DEMO_SCRIPT_ZH = Path("docs/interview-demo-script-zh.md")
+APPLICATION_PACKAGE_ZH = Path("docs/application-package-zh.md")
 DEMO_FLOW = Path("docs/demo-flow.md")
 SAMPLE_PR_COMMENT = Path("reports/examples/sample-pr-comment.md")
 CI_WORKFLOW = Path(".github/workflows/ci.yml")
@@ -25,6 +26,7 @@ CHINESE_INTERVIEW_DOCS = (
     INTERVIEW_QA_ZH,
     INTERVIEW_WALKTHROUGH_ZH,
     INTERVIEW_DEMO_SCRIPT_ZH,
+    APPLICATION_PACKAGE_ZH,
 )
 MOJIBAKE_PATTERNS = (
     "锟",
@@ -122,6 +124,7 @@ def test_readme_links_chinese_interview_materials():
     assert "docs/interview-qa.md" in readme
     assert "docs/interview-walkthrough-zh.md" in readme
     assert "docs/interview-demo-script-zh.md" in readme
+    assert "docs/application-package-zh.md" in readme
 
 
 def test_chinese_interview_docs_cover_current_project_story():
@@ -222,6 +225,26 @@ def test_chinese_demo_script_explains_order_flow_and_next_steps():
         "不会自动发评论",
     ):
         assert phrase in script
+
+
+def test_application_package_is_copy_ready_for_job_search():
+    package = APPLICATION_PACKAGE_ZH.read_text(encoding="utf-8")
+
+    for phrase in (
+        "简历项目经历 4 条 bullet",
+        "3 分钟演示讲稿",
+        "Dashboard -> Demo Shop 下单 -> failure artifacts",
+        "候选根因 / 诊断假设",
+        "不调用 GitHub PR/Issues API",
+        "不会自动评论 PR",
+        "Provider Status",
+        "DeepSeek",
+        "pytest",
+        "Playwright",
+        "投递前检查清单",
+        "项目级别定位",
+    ):
+        assert phrase in package
 
 
 def test_portfolio_walkthrough_explains_order_flow_purpose():

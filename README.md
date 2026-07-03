@@ -230,6 +230,8 @@ See [docs/interview-walkthrough-zh.md](docs/interview-walkthrough-zh.md) for a 3
 
 See [docs/interview-demo-script-zh.md](docs/interview-demo-script-zh.md) for a Chinese demo script that explains Dashboard -> Demo Shop order -> QA reports.
 
+See [docs/application-package-zh.md](docs/application-package-zh.md) for copy-ready resume bullets, a 3-minute talk track, and interview Q&A.
+
 ## Resume Description
 
 Built an AI-powered QA automation platform using Python, FastAPI, pytest, Playwright, and GitHub Actions. The system runs API and E2E tests, collects failure artifacts, and generates structured bug diagnosis reports with suspected root causes, reproduction steps, evidence, and fix suggestions.
