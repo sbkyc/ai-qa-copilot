@@ -30,6 +30,17 @@ def test_dashboard_explains_ai_and_artifact_boundaries(client):
     assert "curated demo artifact" in response.text
 
 
+def test_dashboard_explains_interview_demo_path(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "面试演示路径" in response.text
+    assert "先看 Dashboard" in response.text
+    assert "进入 Demo Shop 下单" in response.text
+    assert "再看 qa-reports" in response.text
+    assert "下单流程只是被测业务场景" in response.text
+
+
 def test_dashboard_provider_status_is_redacted(client, monkeypatch):
     clear_provider_env(monkeypatch)
     monkeypatch.setenv("AI_PROVIDER", "openai-compatible")
@@ -82,6 +93,23 @@ def test_products_page_requires_login(client):
 
     assert response.status_code == 303
     assert response.headers["location"] == "/login"
+
+
+def test_order_success_page_explains_qa_next_steps(client):
+    client.cookies.set("qa_user", "alice")
+
+    response = client.post("/orders", data={"product_id": "1", "quantity": "1"})
+
+    assert response.status_code == 200
+    assert "订单创建成功" in response.text
+    assert "这一步证明 Demo Shop 是真实被测系统" in response.text
+    assert "下单成功不是终点" in response.text
+    assert "如果这里失败" in response.text
+    assert "failure JSON" in response.text
+    assert "AI diagnosis" in response.text
+    assert "pr-comment.md" in response.text
+    assert "返回 Dashboard" in response.text
+    assert "继续测试下单" in response.text
 
 
 def test_products_page_shows_redacted_provider_status(client, monkeypatch):

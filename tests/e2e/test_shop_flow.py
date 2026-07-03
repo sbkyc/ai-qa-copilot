@@ -26,6 +26,8 @@ def test_user_can_login_and_create_order(page: Page, live_server: str):
 
     expect(page.get_by_role("heading", name="订单创建成功")).to_be_visible()
     expect(page.get_by_text("alice 已购买 1 件 无线鼠标。")).to_be_visible()
+    expect(page.get_by_role("heading", name="下单成功不是终点")).to_be_visible()
+    expect(page.get_by_role("link", name="返回 Dashboard")).to_be_visible()
 
 
 @pytest.mark.e2e
