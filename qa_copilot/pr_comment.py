@@ -13,6 +13,8 @@ SECRET_PATTERNS = (
     re.compile(r"Bearer\s+[A-Za-z0-9._-]+"),
     re.compile(r"(?i)(authorization\s*:\s*)\S+"),
     re.compile(r"(?i)((?:api[_-]?key|password|cookie)\s*[:=]\s*)\S+"),
+    re.compile(r"\b[A-Z0-9_]*(?:API_KEY|TOKEN|SECRET)[A-Z0-9_]*\b"),
+    re.compile(r"https?://(?:[^\s/]*internal[^\s/]*|tenant\.[^\s/]+)[^\s]*", re.I),
 )
 
 
@@ -110,9 +112,10 @@ def build_pr_comment(
 
 ### Safety
 
-This preview applies basic redaction and avoids including raw proprietary logs by default.
-It intentionally avoids provider key sources, custom base URLs, model names, and full raw traces.
-Review comments before posting to public PRs.
+This preview applies basic secret-like redaction and avoids including full raw traces by default.
+It does not call the GitHub API or require a GitHub token.
+Review generated comments before posting to public PRs, especially if diagnosis reports may contain
+proprietary logs, internal URLs, model names, or provider configuration details.
 """
     return redact_comment_text(comment).strip() + "\n"
 

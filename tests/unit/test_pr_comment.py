@@ -119,6 +119,20 @@ Failure with key sk-test-secret and Authorization: Bearer abc.def
     assert "[REDACTED]" in comment
 
 
+def test_build_pr_comment_redacts_provider_config_like_values():
+    diagnosis = """
+## Summary
+
+Provider details used DEEPSEEK_API_KEY and https://tenant.internal.example/v1.
+"""
+
+    comment = build_pr_comment(diagnosis)
+
+    assert "DEEPSEEK_API_KEY" not in comment
+    assert "tenant.internal.example" not in comment
+    assert "[REDACTED]" in comment
+
+
 def test_write_pr_comment_writes_markdown(tmp_path: Path):
     input_path = tmp_path / "diagnosis.md"
     output_path = tmp_path / "comment.md"

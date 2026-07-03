@@ -30,4 +30,7 @@ The example artifact set shows five common QA failure modes: API status mismatch
 
 ### Safety
 
-This preview applies basic redaction and avoids including raw proprietary logs by default. It intentionally avoids provider key sources, custom base URLs, model names, and full raw traces. Review comments before posting to public PRs.
+This preview applies basic secret-like redaction and avoids including full raw traces by default.
+It does not call the GitHub API or require a GitHub token.
+Review generated comments before posting to public PRs, especially if diagnosis reports may contain
+proprietary logs, internal URLs, model names, or provider configuration details.

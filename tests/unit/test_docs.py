@@ -162,6 +162,7 @@ def test_sample_pr_comment_exists_and_is_safe():
     assert "Failure Mode Matrix" in text
     assert "Recommended next steps" in text
     assert "reports/examples/sample-ai-diagnosis.md" in text
-    assert "Review comments before posting to public PRs" in text
+    assert "basic secret-like redaction" in text
+    assert "Review generated comments before posting to public PRs" in text
     assert "sk-" not in text
     assert "Bearer " not in text
