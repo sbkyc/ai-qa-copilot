@@ -26,7 +26,7 @@ AI 自动化测试与缺陷诊断平台 | Python / FastAPI / pytest / Playwright
 - 基于 pytest 设计接口自动化测试和服务层测试，使用 fixture 隔离测试数据库，并通过 hook 收集失败 JSON 产物。
 - 使用 Playwright Python 实现浏览器 E2E 测试，覆盖登录和下单核心流程，并在失败时保留截图、trace 引用和测试上下文。
 - 接入 GitHub Actions 自动运行 lint、API 测试、E2E 测试和 AI diagnosis，并上传测试报告、失败产物和诊断报告。
-- 设计 AI diagnosis CLI，按 failure mode 生成包含证据、分类、根因、复现步骤和修复建议的 Failure Mode Matrix。
+- 设计 AI diagnosis CLI，按 failure mode 生成包含证据、分类、候选根因、复现步骤和修复建议的 Failure Mode Matrix。
 - 实现 OpenAI / DeepSeek / OpenAI-compatible provider adapter 与 Provider Status UI，默认脱敏 API key、base URL、model 和 key source。
 ```
 
@@ -38,7 +38,7 @@ AI 自动化测试与缺陷诊断平台 | Python / FastAPI / pytest / Playwright
 2. 我用 pytest 覆盖接口和业务逻辑，用 fixture 保证每个测试有独立数据环境。
 3. 我用 Playwright 测真实浏览器流程，验证登录和下单不只是接口层可用。
 4. 当测试失败时，pytest hook 会把失败用例、phase、耗时、longrepr 和 keywords 写成 JSON artifact。
-5. AI diagnosis 会读取这些 failure artifacts，并按 Failure Mode Matrix 输出证据、分类、根因和修复建议。
+5. AI diagnosis 会读取这些 failure artifacts，并按 Failure Mode Matrix 输出证据、分类、候选根因和修复建议。
 6. Provider 层支持 OpenAI、DeepSeek 和 OpenAI-compatible gateway，同时用 health check 和 Provider Status UI 展示 readiness。
 7. Provider Status 和公开 API 默认脱敏，不暴露 API key、base URL、model 或 key source，适合 public portfolio 展示。
 8. README、portfolio walkthrough、截图和截图复现脚本把项目包装成面试官可以快速理解的演示路径。
@@ -60,4 +60,5 @@ AI 自动化测试与缺陷诊断平台 | Python / FastAPI / pytest / Playwright
 - **Failure Mode Matrix**：报告不是散文，而是把失败按模式分组，方便判断优先级和责任边界。
 - **DeepSeek / OpenAI-compatible 适配**：不是只写死 OpenAI，而是抽出 provider adapter，适合国内外不同模型服务。
 - **CI 产物闭环**：测试失败后仍保留 pytest report、failure JSON 和 AI diagnosis report，AI 调用失败不会掩盖测试结果。
+- **CI artifact 证据链**：GitHub Actions 会上传 `qa-reports`，包含 pytest HTML 报告、failure JSON、AI diagnosis report 和 dry-run PR comment preview，展示从测试失败到团队 review 摘要的完整闭环。
 - **portfolio walkthrough**：项目有 3 分钟演示路线、截图和截图复现脚本，面试官不跑项目也能看懂核心价值。

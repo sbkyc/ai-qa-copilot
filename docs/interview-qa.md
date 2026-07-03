@@ -54,11 +54,21 @@ Provider Status 的作用是让面试官或维护者看到当前 AI provider 是
 
 这样报告可以同时回答三个问题：失败证据是什么，可能属于哪类问题，下一步应该谁去处理。对 QA 自动化来说，这比单纯堆日志更适合团队协作和面试展示。
 
-## 9. AI diagnosis 和普通测试报告有什么区别？
+## 9. CI artifacts 怎么展示项目价值？
 
-普通测试报告更偏原始事实，比如 nodeid、assertion、traceback、截图和耗时。AI diagnosis 会把这些事实组织成可读诊断：证据、分类、可能根因、复现步骤、修复建议和风险。它不替代 pytest 或 Playwright，而是把失败产物变成更容易行动的分析材料。
+CI 不是只看绿不绿。这个项目会在 GitHub Actions 里上传 `qa-reports` artifact，把测试执行和失败分析的证据链保留下来。
 
-## 10. 这个项目体现了哪些自动化测试能力？
+我会重点展示这些文件：`reports/latest/pytest-report.html` 说明 pytest / Playwright 真实执行过；`reports/latest/failures/*.json` 保存结构化失败证据；`reports/latest/ai-diagnosis.md` 输出 AI diagnosis 或 fallback report；`reports/latest/pr-comment.md` 是 dry-run PR comment preview，展示未来接入 PR review workflow 的形态，但当前不会自动评论 PR，也不需要 GitHub token。
+
+这条链路说明项目不只是跑测试，而是把测试失败转成可审阅的工程产物：failure JSON 作为输入，AI diagnosis 生成 Failure Mode Matrix，`pr-comment.md` 生成 review-friendly 摘要，最后由 `qa-reports` artifact 保留完整证据链。
+
+安全边界也要说清楚：`pr-comment.md` 有 basic redaction，但完整 artifact 仍可能包含 raw test logs、screenshots、traces、request/response snippets 或 stack traces。真实 proprietary systems 使用前必须 Review artifact，不能直接公开内部日志。
+
+## 10. AI diagnosis 和普通测试报告有什么区别？
+
+普通测试报告更偏原始事实，比如 nodeid、assertion、traceback、截图和耗时。AI diagnosis 会把这些事实组织成可读诊断：证据、分类、候选根因/诊断假设、复现步骤、修复建议和风险。它不替代 pytest 或 Playwright，而是把失败产物变成更容易行动的分析材料。
+
+## 11. 这个项目体现了哪些自动化测试能力？
 
 - pytest fixture 管理测试数据库。
 - 参数清晰的 API 测试。
@@ -68,7 +78,7 @@ Provider Status 的作用是让面试官或维护者看到当前 AI provider 是
 - GitHub Actions CI。
 - 失败场景样例和可复现 demo flow。
 
-## 11. 这个项目体现了哪些 AI 应用开发能力？
+## 12. 这个项目体现了哪些 AI 应用开发能力？
 
 - 把 AI 放入真实工程流程，而不是单独做聊天 demo。
 - 设计 prompt，把测试失败上下文转成结构化输入。
@@ -78,13 +88,13 @@ Provider Status 的作用是让面试官或维护者看到当前 AI provider 是
 - 输出 Markdown 报告，方便 CI 上传和人工阅读。
 - 在 AI 不可用时生成 fallback report，保证主流程可靠。
 
-## 12. 你在项目里具体做了什么？
+## 13. 你在项目里具体做了什么？
 
 可以这样回答：
 
 我负责定义项目目标和验收标准，把它从“自动化测试 demo”推进成“AI QA Copilot portfolio 项目”。我重点把控了几个方向：被测系统和测试闭环、失败 artifact schema、AI diagnosis 输出结构、DeepSeek/OpenAI-compatible provider adapter、Provider Status 的安全脱敏、CI 验证、README walkthrough 和面试展示材料。Codex 作为实现助手参与编码，但需求取舍、review 重点、安全边界和最终验收由我来推动。
 
-## 13. 如果继续扩展，你会做什么？
+## 14. 如果继续扩展，你会做什么？
 
 可以继续扩展四个方向：
 
@@ -93,6 +103,6 @@ Provider Status 的作用是让面试官或维护者看到当前 AI provider 是
 - 解析真实 Playwright trace、JUnit XML 或 Allure report，让证据更完整。
 - 把 provider config resolver 从 health 模块中进一步抽出，做成更清晰的配置层。
 
-## 14. 面试时一句话总结
+## 15. 面试时一句话总结
 
 这是一个面向求职展示的 AI 自动化测试平台：它用 Python 完成真实 Web/API 测试工程流程，并把 AI 接入失败分析环节，展示我从自动化测试向 AI 应用开发迁移的能力。
