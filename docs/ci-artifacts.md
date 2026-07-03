@@ -12,7 +12,7 @@ For a stable portfolio demo, use the **Demo Artifacts** workflow from the GitHub
 
 `demo-qa-reports` is a curated demo artifact built from `reports/examples` and `reports/examples/sample-ai-diagnosis.md`. It is useful for interviews because it always includes example failure JSON, an AI diagnosis sample, and a dry-run PR comment preview without requiring a failing CI run.
 
-The manual demo workflow does not call the GitHub API, does not post a real PR comment, and does not use repository secrets or external AI provider keys.
+The manual demo workflow does not call GitHub PR/Issues API, does not post comments, and does not use repository secrets or external AI provider keys.
 
 ## What is inside
 

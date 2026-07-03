@@ -28,7 +28,7 @@ The committed preview is available at:
 reports/examples/sample-pr-comment.md
 ```
 
-This preview is Markdown only. It does not call the GitHub API, does not need `GITHUB_TOKEN`, and does not post a real PR comment.
+This preview is Markdown only. It does not call GitHub PR/Issues API, does not need `GITHUB_TOKEN`, and does not post comments.
 
 If `OPENAI_API_KEY` is not configured, the command writes a fallback report. This is intentional: the automation workflow should still complete even when AI access is unavailable.
 

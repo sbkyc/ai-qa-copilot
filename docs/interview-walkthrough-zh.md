@@ -82,7 +82,7 @@ Failure Mode Matrix 是这个项目最适合截图展示的部分。它把失败
 
 这条链路可以这样总结：pytest / Playwright 发现问题 → failure artifacts 保存证据 → AI diagnosis 生成 Failure Mode Matrix → `pr-comment.md` 变成 review-friendly 摘要 → `qa-reports` artifact 保留完整证据链。
 
-如果只是面试前想稳定演示，可以在 GitHub Actions 里手动触发 Demo Artifacts workflow。它通过 `workflow_dispatch` 生成基于 curated examples 的 `demo-qa-reports`，不调用 GitHub API，也不会自动评论 PR。
+如果只是面试前想稳定演示，可以在 GitHub Actions 里手动触发 Demo Artifacts workflow。它通过 `workflow_dispatch` 生成基于 curated examples 的 `demo-qa-reports`，不调用 GitHub PR/Issues API，也不会自动评论 PR。
 
 安全边界也要讲清楚：`pr-comment.md` 有 basic redaction，但完整 `qa-reports` artifact 可能包含 raw test logs、failure JSON、screenshots、traces、request/response snippets 或 stack traces。真实 proprietary systems 使用前必须 Review artifact，不能直接把内部日志公开。
 

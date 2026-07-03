@@ -88,9 +88,9 @@ For a stable portfolio example, use:
 reports/examples/sample-pr-comment.md
 ```
 
-This preview does not call the GitHub API, does not need a token, and does not post a real comment. It shows the next integration step: test failure artifacts become an AI diagnosis report, then a concise review comment.
+This preview does not call GitHub PR/Issues API, does not need a token, and does not post comments. It shows the next integration step: test failure artifacts become an AI diagnosis report, then a concise review comment.
 
-In GitHub Actions, the same dry-run preview is uploaded as `reports/latest/pr-comment.md` inside the `qa-reports` artifact. It does not post a real PR comment.
+In GitHub Actions, the same dry-run preview is uploaded as `reports/latest/pr-comment.md` inside the `qa-reports` artifact. It does not post comments.
 
 When showing CI, open the `qa-reports` artifact and point to `pytest-report.html`, `ai-diagnosis.md`, and `pr-comment.md`. See [CI Artifacts](ci-artifacts.md) for the file-by-file guide.
 

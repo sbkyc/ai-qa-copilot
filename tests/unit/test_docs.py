@@ -44,6 +44,19 @@ def test_readme_links_portfolio_walkthrough():
     assert "3-minute interview path" in readme
 
 
+def test_readme_front_page_summarizes_portfolio_value():
+    readme = README.read_text(encoding="utf-8")
+
+    for phrase in (
+        "End-to-end QA automation",
+        "Failure evidence pipeline",
+        "AI-assisted diagnosis",
+        "Provider safety",
+        "CI portfolio artifacts",
+    ):
+        assert phrase in readme
+
+
 def test_portfolio_walkthrough_covers_demo_story():
     walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
 
@@ -245,8 +258,8 @@ def test_docs_describe_ci_pr_comment_preview_artifact():
 
     assert "reports/latest/pr-comment.md" in combined
     assert "qa-reports" in combined
-    assert "does not call the GitHub API" in combined
-    assert "does not post a real" in combined
+    assert "does not call GitHub PR/Issues API" in combined
+    assert "does not post comments" in combined
     assert "CI artifacts may still contain raw test logs or traces" in combined
 
 
@@ -335,6 +348,6 @@ def test_docs_explain_manual_demo_artifact_boundary():
     assert "workflow_dispatch" in combined
     assert "demo-qa-reports" in combined
     assert "curated" in combined
-    assert "does not post a real PR comment" in combined
-    assert "does not call the GitHub API" in combined
+    assert "does not post comments" in combined
+    assert "does not call GitHub PR/Issues API" in combined
     assert "Review artifacts" in combined
