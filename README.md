@@ -6,12 +6,11 @@ AI QA Copilot is a Python portfolio project that combines automated testing and 
 
 ## What It Demonstrates
 
-- FastAPI demo application used as the system under test
-- API test automation with pytest
-- Browser E2E automation with Playwright for Python
-- Test reports, failure JSON artifacts, screenshots, and traces
-- GitHub Actions CI
-- Optional AI-generated diagnosis reports for failed tests
+- End-to-end QA automation: FastAPI demo shop + pytest API/service tests + Playwright E2E
+- Failure evidence pipeline: pytest HTML report + failure JSON + screenshots/traces when available
+- AI-assisted diagnosis: Failure Mode Matrix with evidence, classification, candidate cause, and next action
+- Provider safety: OpenAI / DeepSeek / OpenAI-compatible adapter with redacted Provider Status UI
+- CI portfolio artifacts: `qa-reports` and manual `demo-qa-reports` for reproducible review
 
 ## Portfolio Walkthrough
 
@@ -130,7 +129,7 @@ CI also generates a dry-run PR comment preview at:
 reports/latest/pr-comment.md
 ```
 
-It is uploaded inside the `qa-reports` artifact. It does not call the GitHub API or post a real PR comment.
+It is uploaded inside the `qa-reports` artifact. It does not call GitHub PR/Issues API or post comments.
 
 See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
 
@@ -140,7 +139,7 @@ See [docs/diagnosis-examples.md](docs/diagnosis-examples.md) for the curated Pla
 
 GitHub Actions uploads a `qa-reports` artifact for each CI run. It includes the pytest HTML report, structured failure JSON, AI diagnosis report, and dry-run PR comment preview.
 
-For portfolio demos, the `Demo Artifacts` workflow can be started manually with `workflow_dispatch`. It builds a curated `demo-qa-reports` artifact from `reports/examples`, does not call the GitHub API, and does not post a real PR comment.
+For portfolio demos, the `Demo Artifacts` workflow can be started manually with `workflow_dispatch`. It builds a curated `demo-qa-reports` artifact from `reports/examples`, does not call GitHub PR/Issues API, and does not post comments.
 
 See [CI Artifacts](docs/ci-artifacts.md) for the file-by-file guide.
 
