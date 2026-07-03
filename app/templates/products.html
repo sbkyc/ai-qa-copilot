@@ -1,45 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Products</title>
+    <title>商品列表</title>
     <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
     <header class="topbar">
       <a class="brand" href="/">AI QA Copilot</a>
-      <span class="topbar-meta">Signed in as {{ username }}</span>
+      <nav class="topbar-nav" aria-label="主导航">
+        <a href="/">Dashboard</a>
+        <a href="/login">Demo Shop</a>
+        <a href="/docs">API Docs</a>
+      </nav>
+      <span class="topbar-meta">当前用户：{{ username }}</span>
     </header>
     <main class="page-shell">
       <section class="page-heading">
-        <h1>Products</h1>
-        <p>Choose an item and create an order to exercise the E2E flow.</p>
+        <h1>商品列表</h1>
+        <p>选择商品并创建订单，用来演示完整的端到端测试流程。</p>
       </section>
       <section class="panel provider-status provider-status-{{ 'ok' if provider_health.ok else 'warning' }}" aria-labelledby="provider-status-title">
         <div class="provider-status-header">
           <div>
-            <h2 id="provider-status-title">Provider Status</h2>
+            <h2 id="provider-status-title">AI 服务状态</h2>
             <p class="provider-status-summary">{{ provider_health.status_label }}</p>
           </div>
-          <a class="button-link button-link-secondary" href="/products">Refresh</a>
+          <a class="button-link button-link-secondary" href="/products">刷新</a>
         </div>
         <dl class="provider-status-meta">
           <div>
-            <dt>Provider</dt>
+            <dt>AI 服务商</dt>
             <dd>{{ provider_health.provider }}</dd>
           </div>
           <div>
-            <dt>API style</dt>
+            <dt>API 风格</dt>
             <dd>{{ provider_health.api_style }}</dd>
           </div>
           <div>
-            <dt>API key</dt>
-            <dd>{{ 'Configured' if provider_health.api_key_configured else 'Missing' }}</dd>
+            <dt>密钥状态</dt>
+            <dd>{{ '已配置' if provider_health.api_key_configured else '缺失' }}</dd>
           </div>
         </dl>
         {% if provider_health.issues %}
-          <ul class="provider-issues" aria-label="Provider configuration issues">
+          <ul class="provider-issues" aria-label="AI 服务配置问题">
             {% for issue in provider_health.issues %}
               <li>
                 <strong>{{ issue.label }}</strong>
@@ -52,27 +57,27 @@
       {% if error %}
         <p role="alert" class="alert">{{ error }}</p>
       {% endif %}
-      <section class="product-grid" aria-label="Product catalog">
+      <section class="product-grid" aria-label="商品目录">
         {% for product in products %}
           <article class="product-card">
             <h2>{{ product.name }}</h2>
             <dl class="product-meta">
               <div>
-                <dt>Price</dt>
-                <dd>{{ product.price_cents }} cents</dd>
+                <dt>价格</dt>
+                <dd>{{ product.price_cents }} 分</dd>
               </div>
               <div>
-                <dt>Stock</dt>
+                <dt>库存</dt>
                 <dd>{{ product.stock }}</dd>
               </div>
             </dl>
             <form method="post" action="/orders">
               <input type="hidden" name="product_id" value="{{ product.id }}">
               <label>
-                Quantity
+                数量
                 <input name="quantity" type="number" value="1" min="1">
               </label>
-              <button type="submit">Create order</button>
+              <button type="submit">创建订单</button>
             </form>
           </article>
         {% endfor %}

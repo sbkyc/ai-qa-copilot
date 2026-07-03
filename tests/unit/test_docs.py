@@ -42,6 +42,8 @@ def test_readme_links_portfolio_walkthrough():
 
     assert "[Portfolio Walkthrough](docs/portfolio-walkthrough.md)" in readme
     assert "3-minute interview path" in readme
+    assert "Chinese Showcase Dashboard" in readme
+    assert "http://127.0.0.1:8000/login" in readme
 
 
 def test_readme_front_page_summarizes_portfolio_value():

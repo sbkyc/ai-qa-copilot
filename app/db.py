@@ -52,9 +52,9 @@ def seed_database(connection: sqlite3.Connection) -> None:
     connection.executemany(
         "INSERT INTO products (name, price_cents, stock) VALUES (?, ?, ?)",
         [
-            ("Wireless Mouse", 2599, 10),
-            ("Mechanical Keyboard", 7999, 5),
-            ("USB-C Hub", 4299, 8),
+            ("无线鼠标", 2599, 10),
+            ("机械键盘", 7999, 5),
+            ("USB-C 扩展坞", 4299, 8),
         ],
     )
     connection.commit()

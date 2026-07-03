@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI 自动化测试与缺陷诊断平台</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">AI QA Copilot</a>
+      <nav class="topbar-nav" aria-label="主导航">
+        <a href="/" aria-current="page">Dashboard</a>
+        <a href="/login">Demo Shop</a>
+        <a href="/docs">API Docs</a>
+      </nav>
+    </header>
+
+    <main class="dashboard-shell">
+      <section class="dashboard-hero" aria-labelledby="dashboard-title">
+        <div class="dashboard-hero-copy">
+          <h1 id="dashboard-title">AI 自动化测试与缺陷诊断平台</h1>
+          <p>
+            把 pytest / Playwright 测试失败转成 failure artifacts、AI diagnosis、
+            Failure Mode Matrix 和 CI artifacts，让自动化测试结果更容易审阅和复盘。
+          </p>
+          <div class="hero-actions">
+            <a class="button-link" href="/login">进入 Demo Shop</a>
+            <a class="button-link button-link-secondary" href="/api/provider-health">查看 Provider Health API</a>
+          </div>
+        </div>
+        <aside class="hero-summary" aria-label="项目实时概览">
+          <div>
+            <span>被测商品</span>
+            <strong>{{ product_count }}</strong>
+          </div>
+          <div>
+            <span>示例 failure artifacts</span>
+            <strong>{{ sample_artifact_count }}</strong>
+          </div>
+          <div>
+            <span>支持 Provider</span>
+            <strong>{{ provider_count }}</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="value-title">
+        <div class="section-heading">
+          <h2 id="value-title">30 秒看懂项目价值</h2>
+          <p>不是普通电商 Demo，而是一条从自动化测试失败到团队 review 摘要的 QA 工程闭环。</p>
+        </div>
+        <div class="value-grid">
+          {% for card in value_cards %}
+            <article class="value-card">
+              <h3>{{ card.title }}</h3>
+              <p>{{ card.body }}</p>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="dashboard-section pipeline-panel" aria-labelledby="pipeline-title">
+        <div class="section-heading">
+          <h2 id="pipeline-title">测试失败证据链</h2>
+          <p>把测试结果沉淀成结构化证据，再进入 AI 辅助诊断和 dry-run PR comment preview。</p>
+        </div>
+        <ol class="pipeline-steps">
+          {% for step in pipeline_steps %}
+            <li>
+              <span>{{ loop.index }}</span>
+              <strong>{{ step }}</strong>
+            </li>
+          {% endfor %}
+        </ol>
+      </section>
+
+      <section class="dashboard-section matrix-panel" aria-labelledby="matrix-title">
+        <div class="section-heading">
+          <h2 id="matrix-title">Failure Mode Matrix 示例</h2>
+          <p>示例来自 reports/examples，是 curated demo data，用于稳定展示诊断结构，不代表本次真实 CI 失败。</p>
+        </div>
+        <div class="matrix-scroll">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Failure Mode</th>
+                <th>示例</th>
+                <th>证据</th>
+                <th>诊断输出</th>
+                <th>下一步</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in failure_mode_rows %}
+                <tr>
+                  <td>{{ row.mode }}</td>
+                  <td>{{ row.example }}</td>
+                  <td>{{ row.evidence }}</td>
+                  <td>候选根因 / 诊断假设</td>
+                  <td>{{ row.next_action }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="dashboard-two-column">
+        <section class="panel provider-status provider-status-{{ 'ok' if provider_health.ok else 'warning' }}" aria-labelledby="dashboard-provider-title">
+          <div class="provider-status-header">
+            <div>
+              <h2 id="dashboard-provider-title">AI 服务状态</h2>
+              <p class="provider-status-summary">{{ provider_health.status_label }}</p>
+            </div>
+            <a class="button-link button-link-secondary" href="/">刷新</a>
+          </div>
+          <dl class="provider-status-meta">
+            <div>
+              <dt>AI 服务商</dt>
+              <dd>{{ provider_health.provider }}</dd>
+            </div>
+            <div>
+              <dt>API 风格</dt>
+              <dd>{{ provider_health.api_style }}</dd>
+            </div>
+            <div>
+              <dt>密钥状态</dt>
+              <dd>{{ '已配置' if provider_health.api_key_configured else '缺失' }}</dd>
+            </div>
+          </dl>
+          {% if provider_health.issues %}
+            <ul class="provider-issues" aria-label="AI 服务配置问题">
+              {% for issue in provider_health.issues %}
+                <li>
+                  <strong>{{ issue.label }}</strong>
+                  <span>{{ issue.hint }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <p class="boundary-note">
+            Provider Status 只展示 readiness，不暴露 API key、base URL、model 或 key source。
+          </p>
+        </section>
+
+        <section class="panel provider-list" aria-labelledby="provider-list-title">
+          <h2 id="provider-list-title">Provider adapter 覆盖</h2>
+          <p>当前支持 {{ provider_count }} 个 provider preset，Dashboard 只展示名称，不展示运行时密钥来源。</p>
+          <ul>
+            {% for provider in provider_names %}
+              <li>{{ provider }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="artifact-title">
+        <div class="section-heading">
+          <h2 id="artifact-title">CI artifact 边界</h2>
+          <p>dry-run PR comment preview 不调用 GitHub PR/Issues API，也不会自动评论 PR。</p>
+        </div>
+        <div class="artifact-grid">
+          {% for artifact in artifact_cards %}
+            <article class="artifact-card">
+              <h3>{{ artifact.title }}</h3>
+              <strong>{{ artifact.kind }}</strong>
+              <p>{{ artifact.body }}</p>
+            </article>
+          {% endfor %}
+        </div>
+        <p class="boundary-note">
+          完整 artifacts 可能包含 raw logs、screenshots、traces 或 stack traces；用于 proprietary systems 前必须人工 review。
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

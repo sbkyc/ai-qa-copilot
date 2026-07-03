@@ -30,7 +30,7 @@ from app.services import (
     token_for_username,
     username_from_token,
 )
-from qa_copilot.artifacts import FailureArtifact
+from qa_copilot.artifacts import FailureArtifact, load_failure_artifacts
 from qa_copilot.diagnosis import diagnose_with_ai
 from qa_copilot.prompt_builder import build_diagnosis_prompt
 from qa_copilot.provider_health import check_provider_health
@@ -39,20 +39,107 @@ from qa_copilot.providers import supported_provider_specs
 templates = Jinja2Templates(directory="app/templates")
 
 PROVIDER_ISSUE_LABELS = {
-    "api_key": "Missing API key",
-    "base_url": "Missing base URL",
-    "model": "Missing model",
-    "unsupported_provider": "Unsupported provider",
-    "unsupported_api_style": "Unsupported API style",
+    "api_key": "缺少 API key",
+    "base_url": "缺少 base URL",
+    "model": "缺少 model",
+    "unsupported_provider": "不支持的 provider",
+    "unsupported_api_style": "不支持的 API style",
 }
 
 PROVIDER_ISSUE_HINTS = {
-    "api_key": "Set AI_API_KEY or a provider-specific key.",
-    "base_url": "Add AI_BASE_URL for OpenAI-compatible gateways.",
-    "model": "Set AI_MODEL for the selected provider.",
-    "unsupported_provider": "Check the AI_PROVIDER spelling.",
-    "unsupported_api_style": "Use AI_API_STYLE=chat or AI_API_STYLE=responses.",
+    "api_key": "配置 AI_API_KEY 或对应服务商的专用 key。",
+    "base_url": "为 OpenAI-compatible 网关配置 AI_BASE_URL。",
+    "model": "为当前 provider 配置 AI_MODEL。",
+    "unsupported_provider": "检查 AI_PROVIDER 是否拼写正确。",
+    "unsupported_api_style": "使用 AI_API_STYLE=chat 或 AI_API_STYLE=responses。",
 }
+
+DASHBOARD_VALUE_CARDS = [
+    {
+        "title": "端到端 QA 自动化",
+        "body": (
+            "FastAPI 被测系统配合 pytest API/service tests 与 Playwright E2E，"
+            "覆盖从接口到浏览器的关键路径。"
+        ),
+    },
+    {
+        "title": "失败证据链",
+        "body": (
+            "测试失败会沉淀 pytest HTML report、failure JSON，以及可用时的 "
+            "screenshots / traces。"
+        ),
+    },
+    {
+        "title": "AI 辅助诊断",
+        "body": "把失败上下文组织成 Failure Mode Matrix，输出证据、分类、候选根因和下一步建议。",
+    },
+    {
+        "title": "Provider 安全边界",
+        "body": "AI 服务状态可观察，但不暴露 API key、base URL、model 或 key source。",
+    },
+    {
+        "title": "CI 作品集产物",
+        "body": "qa-reports 与 demo-qa-reports 让面试官不用复现失败，也能看到完整 QA 交付物。",
+    },
+]
+
+DASHBOARD_PIPELINE_STEPS = [
+    "pytest / Playwright",
+    "failure JSON",
+    "AI diagnosis",
+    "Failure Mode Matrix",
+    "dry-run PR comment preview",
+    "qa-reports",
+]
+
+FAILURE_MODE_ROWS = [
+    {
+        "mode": "Product/API behavior",
+        "example": "库存不足返回状态码不符合预期",
+        "evidence": "API status mismatch",
+        "next_action": "检查业务异常到 HTTP 409 的映射。",
+    },
+    {
+        "mode": "API contract",
+        "example": "请求/响应契约漂移",
+        "evidence": "422 validation error",
+        "next_action": "对齐 request body、schema 和测试契约。",
+    },
+    {
+        "mode": "UI/E2E behavior",
+        "example": "Playwright 等待按钮可见失败",
+        "evidence": "locator visibility assertion",
+        "next_action": "检查页面状态、按钮禁用逻辑和截图证据。",
+    },
+    {
+        "mode": "Flaky/timing",
+        "example": "搜索结果偶发失败",
+        "evidence": "10 次运行中失败 3 次",
+        "next_action": "稳定等待条件，排查 debounce / fetch race。",
+    },
+    {
+        "mode": "Environment/setup",
+        "example": "fixture 初始化数据库失败",
+        "evidence": "no such table during setup",
+        "next_action": "检查 fixture 顺序、迁移和测试隔离。",
+    },
+]
+
+ARTIFACT_CARDS = [
+    {
+        "title": "qa-reports",
+        "kind": "真实 CI artifact",
+        "body": (
+            "push / pull_request CI 上传的测试报告、failure JSON、AI diagnosis "
+            "和 dry-run PR comment preview。"
+        ),
+    },
+    {
+        "title": "demo-qa-reports",
+        "kind": "workflow_dispatch curated demo artifact",
+        "body": "基于 reports/examples 的稳定面试演示产物，不代表本次真实 CI 失败。",
+    },
+]
 
 
 def _resolve_db_path(db_path: str | Path | None) -> str | Path:
@@ -75,7 +162,7 @@ def _provider_health_view_model() -> dict[str, object]:
     issues = [
         {
             "label": PROVIDER_ISSUE_LABELS.get(code, code.replace("_", " ").title()),
-            "hint": PROVIDER_ISSUE_HINTS.get(code, "Review the provider environment."),
+            "hint": PROVIDER_ISSUE_HINTS.get(code, "检查 AI 服务环境变量配置。"),
         }
         for code in issue_codes
     ]
@@ -84,8 +171,24 @@ def _provider_health_view_model() -> dict[str, object]:
         "provider": health["provider"],
         "api_style": health["api_style"],
         "api_key_configured": health["api_key_configured"],
-        "status_label": "Ready" if health["ok"] else issues[0]["label"],
+        "status_label": "已就绪" if health["ok"] else issues[0]["label"],
         "issues": issues,
+    }
+
+
+def _dashboard_context(db: sqlite3.Connection) -> dict[str, object]:
+    sample_artifacts = load_failure_artifacts("reports/examples")
+    provider_specs = supported_provider_specs()
+    return {
+        "provider_health": _provider_health_view_model(),
+        "product_count": len(list_products(db)),
+        "sample_artifact_count": len(sample_artifacts),
+        "provider_count": len(provider_specs),
+        "provider_names": list(provider_specs),
+        "value_cards": DASHBOARD_VALUE_CARDS,
+        "pipeline_steps": DASHBOARD_PIPELINE_STEPS,
+        "failure_mode_rows": FAILURE_MODE_ROWS,
+        "artifact_cards": ARTIFACT_CARDS,
     }
 
 
@@ -195,6 +298,14 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         return ProviderHealthResponse(**check_provider_health())
 
     @api.get("/", response_class=HTMLResponse)
+    def dashboard_page(request: Request, db: DbConnection) -> HTMLResponse:
+        return templates.TemplateResponse(
+            request,
+            "dashboard.html",
+            _dashboard_context(db),
+        )
+
+    @api.get("/login", response_class=HTMLResponse)
     def login_page(request: Request) -> HTMLResponse:
         return templates.TemplateResponse(request, "login.html", {"error": ""})
 
@@ -212,7 +323,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             return templates.TemplateResponse(
                 request,
                 "login.html",
-                {"error": "Invalid username or password"},
+                {"error": "用户名或密码错误"},
                 status_code=401,
             )
         response = RedirectResponse("/products", status_code=303)
@@ -226,7 +337,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
     ) -> HTMLResponse | RedirectResponse:
         username = request.cookies.get("qa_user")
         if not username:
-            return RedirectResponse("/", status_code=303)
+            return RedirectResponse("/login", status_code=303)
         return templates.TemplateResponse(
             request,
             "products.html",
@@ -240,17 +351,24 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
     ) -> HTMLResponse | RedirectResponse:
         username = request.cookies.get("qa_user")
         if not username:
-            return RedirectResponse("/", status_code=303)
+            return RedirectResponse("/login", status_code=303)
         form = await request.form()
         product_id = int(str(form.get("product_id", "0")))
         quantity = int(str(form.get("quantity", "1")))
         try:
             order = create_order(db, username, product_id, quantity)
-        except (ProductNotFoundError, InsufficientStockError) as exc:
+        except ProductNotFoundError:
             return templates.TemplateResponse(
                 request,
                 "products.html",
-                products_context(username, db, str(exc)),
+                products_context(username, db, "商品不存在。"),
+                status_code=409,
+            )
+        except InsufficientStockError:
+            return templates.TemplateResponse(
+                request,
+                "products.html",
+                products_context(username, db, "库存不足，无法创建订单。"),
                 status_code=409,
             )
         return templates.TemplateResponse(
