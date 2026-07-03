@@ -128,6 +128,47 @@ def test_chinese_interview_docs_cover_current_project_story():
         assert phrase in combined
 
 
+def test_chinese_interview_docs_cover_ci_artifact_story():
+    combined = "\n".join(
+        (
+            RESUME_ZH.read_text(encoding="utf-8"),
+            INTERVIEW_QA_ZH.read_text(encoding="utf-8"),
+            INTERVIEW_WALKTHROUGH_ZH.read_text(encoding="utf-8"),
+        )
+    )
+
+    for phrase in (
+        "qa-reports",
+        "pytest-report.html",
+        "failures/*.json",
+        "ai-diagnosis.md",
+        "pr-comment.md",
+        "Failure Mode Matrix",
+        "dry-run",
+        "证据链",
+    ):
+        assert phrase in combined
+
+
+def test_chinese_interview_docs_explain_artifact_safety_boundary():
+    combined = "\n".join(
+        (
+            INTERVIEW_QA_ZH.read_text(encoding="utf-8"),
+            INTERVIEW_WALKTHROUGH_ZH.read_text(encoding="utf-8"),
+        )
+    )
+
+    for phrase in (
+        "basic redaction",
+        "raw test logs",
+        "screenshots",
+        "traces",
+        "Review artifact",
+        "proprietary",
+    ):
+        assert phrase in combined
+
+
 def test_chinese_walkthrough_is_a_three_minute_interview_script():
     walkthrough = INTERVIEW_WALKTHROUGH_ZH.read_text(encoding="utf-8")
 
@@ -138,6 +179,7 @@ def test_chinese_walkthrough_is_a_three_minute_interview_script():
         "## AI diagnosis 价值",
         "## Provider 安全设计",
         "## Failure Mode Matrix 怎么讲",
+        "## CI Artifacts 证据链怎么讲",
         "## 我在项目里做了什么",
         "## 后续扩展方向",
     ):
