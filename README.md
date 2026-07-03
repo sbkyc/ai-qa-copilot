@@ -188,11 +188,15 @@ This endpoint returns a redacted health summary. It does not expose API keys, ke
 
 See [docs/github-publish.md](docs/github-publish.md) for the GitHub publishing checklist.
 
-## For Chinese Interviews
+## 中文面试材料 / Chinese Interview Prep
+
+中文材料覆盖项目一句话介绍、简历写法、Provider 安全设计、Failure Mode Matrix 讲解和常见面试问答。
 
 See [docs/resume-zh.md](docs/resume-zh.md) for a Chinese resume description and interview talking points.
 
 See [docs/interview-qa.md](docs/interview-qa.md) for interview questions and suggested answers.
+
+See [docs/interview-walkthrough-zh.md](docs/interview-walkthrough-zh.md) for a 3-minute Chinese interview walkthrough.
 
 ## Resume Description
 
