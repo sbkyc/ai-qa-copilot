@@ -33,6 +33,10 @@ jobs:
         if: always()
         run: python -m qa_copilot.cli --input reports/latest/failures --output reports/latest/ai-diagnosis.md
 
+      - name: Generate PR comment preview
+        if: always()
+        run: python -m qa_copilot.pr_comment --input reports/latest/ai-diagnosis.md --output reports/latest/pr-comment.md
+
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
