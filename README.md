@@ -14,9 +14,11 @@ AI QA Copilot is a Python portfolio project that combines automated testing and 
 
 ## Portfolio Walkthrough
 
-For a 3-minute interview path, start with the Provider Status UI, run the bundled diagnosis examples, and show the Failure Mode Matrix in the sample report.
+For a 3-minute interview path, start with the Chinese Showcase Dashboard at `/`, enter the Demo Shop at `/login`, run the bundled diagnosis examples, and show the Failure Mode Matrix in the sample report.
 
 See [Portfolio Walkthrough](docs/portfolio-walkthrough.md) for the step-by-step demo script.
+
+For a Chinese talk track you can read before interviews, see [中文面试演示脚本](docs/interview-demo-script-zh.md).
 
 ## Visual Preview
 
@@ -65,6 +67,12 @@ Open:
 
 ```text
 http://127.0.0.1:8000
+```
+
+The landing page is a Chinese portfolio Dashboard. The Demo Shop login is available at:
+
+```text
+http://127.0.0.1:8000/login
 ```
 
 Demo account:
@@ -219,6 +227,10 @@ See [docs/resume-zh.md](docs/resume-zh.md) for a Chinese resume description and 
 See [docs/interview-qa.md](docs/interview-qa.md) for interview questions and suggested answers.
 
 See [docs/interview-walkthrough-zh.md](docs/interview-walkthrough-zh.md) for a 3-minute Chinese interview walkthrough.
+
+See [docs/interview-demo-script-zh.md](docs/interview-demo-script-zh.md) for a Chinese demo script that explains Dashboard -> Demo Shop order -> QA reports.
+
+See [docs/application-package-zh.md](docs/application-package-zh.md) for copy-ready resume bullets, a 3-minute talk track, and interview Q&A.
 
 ## Resume Description
 

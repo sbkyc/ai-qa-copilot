@@ -5,7 +5,7 @@ def test_list_products(client):
     response = client.get("/api/products")
 
     assert response.status_code == 200
-    assert response.json()[0]["name"] == "Wireless Mouse"
+    assert response.json()[0]["name"] == "无线鼠标"
 
 
 def test_get_product_by_id(client):

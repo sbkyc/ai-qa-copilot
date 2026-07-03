@@ -37,9 +37,9 @@ def test_list_products_returns_seeded_catalog(db):
     products = list_products(db)
 
     assert [product["name"] for product in products] == [
-        "Wireless Mouse",
-        "Mechanical Keyboard",
-        "USB-C Hub",
+        "无线鼠标",
+        "机械键盘",
+        "USB-C 扩展坞",
     ]
 
 

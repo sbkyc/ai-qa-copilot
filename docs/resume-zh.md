@@ -61,4 +61,4 @@ AI 自动化测试与缺陷诊断平台 | Python / FastAPI / pytest / Playwright
 - **DeepSeek / OpenAI-compatible 适配**：不是只写死 OpenAI，而是抽出 provider adapter，适合国内外不同模型服务。
 - **CI 产物闭环**：测试失败后仍保留 pytest report、failure JSON 和 AI diagnosis report，AI 调用失败不会掩盖测试结果。
 - **CI artifact 证据链**：GitHub Actions 会上传 `qa-reports`，包含 pytest HTML 报告、failure JSON、AI diagnosis report 和 dry-run PR comment preview，展示从测试失败到团队 review 摘要的完整闭环。
-- **portfolio walkthrough**：项目有 3 分钟演示路线、截图和截图复现脚本，面试官不跑项目也能看懂核心价值。
+- **portfolio walkthrough**：项目有中文 Dashboard、3 分钟演示路线、下单成功后的 QA next steps、截图和截图复现脚本，面试官不跑项目也能看懂核心价值。
