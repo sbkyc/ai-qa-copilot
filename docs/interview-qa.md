@@ -66,7 +66,7 @@ CI 不是只看绿不绿。这个项目会在 GitHub Actions 里上传 `qa-repor
 
 ## 10. AI diagnosis 和普通测试报告有什么区别？
 
-普通测试报告更偏原始事实，比如 nodeid、assertion、traceback、截图和耗时。AI diagnosis 会把这些事实组织成可读诊断：证据、分类、可能根因、复现步骤、修复建议和风险。它不替代 pytest 或 Playwright，而是把失败产物变成更容易行动的分析材料。
+普通测试报告更偏原始事实，比如 nodeid、assertion、traceback、截图和耗时。AI diagnosis 会把这些事实组织成可读诊断：证据、分类、候选根因/诊断假设、复现步骤、修复建议和风险。它不替代 pytest 或 Playwright，而是把失败产物变成更容易行动的分析材料。
 
 ## 11. 这个项目体现了哪些自动化测试能力？
 

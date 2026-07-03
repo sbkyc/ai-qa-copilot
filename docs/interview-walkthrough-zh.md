@@ -2,7 +2,7 @@
 
 ## 30 秒项目介绍
 
-这是一个把自动化测试和 AI 缺陷诊断结合起来的 Python portfolio 项目。它先用 FastAPI 做一个可复现的电商 Demo，再用 pytest 和 Playwright 跑 API 与浏览器 E2E 测试。测试失败后，项目会收集 failure artifact，并通过 AI diagnosis 生成包含证据、分类、根因和修复建议的报告。
+这是一个把自动化测试和 AI 缺陷诊断结合起来的 Python portfolio 项目。它先用 FastAPI 做一个可复现的电商 Demo，再用 pytest 和 Playwright 跑 API 与浏览器 E2E 测试。测试失败后，项目会收集 failure artifact，并通过 AI diagnosis 生成包含证据、分类、诊断假设和修复建议的报告。
 
 我想展示的不是“会写几条测试”，而是能把被测系统、测试框架、CI、失败产物、LLM provider、安全脱敏和面试展示串成完整工程闭环。
 
@@ -34,7 +34,7 @@ AI diagnosis 不负责决定测试是否通过，pytest 和 Playwright 才是质
 报告会输出：
 
 - 失败证据
-- 可能根因
+- 候选根因 / 诊断假设
 - 复现步骤
 - 修复建议
 - 风险提示
@@ -78,7 +78,7 @@ Failure Mode Matrix 是这个项目最适合截图展示的部分。它把失败
 - `reports/latest/failures/*.json`：结构化失败产物，是 AI diagnosis 的输入。
 - `reports/latest/ai-diagnosis.md`：完整 AI 诊断报告或 fallback report。
 - `reports/latest/pr-comment.md`：dry-run PR comment preview，展示未来接入 PR review workflow 的形态，但不会自动发真实评论。
-- Playwright screenshots / traces：浏览器失败时的可视化证据。
+- Playwright screenshots / traces：如 CI artifact 中存在，可以作为浏览器失败时的可视化证据。
 
 这条链路可以这样总结：pytest / Playwright 发现问题 → failure artifacts 保存证据 → AI diagnosis 生成 Failure Mode Matrix → `pr-comment.md` 变成 review-friendly 摘要 → `qa-reports` artifact 保留完整证据链。
 
