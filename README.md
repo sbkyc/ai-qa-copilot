@@ -118,6 +118,12 @@ To generate a diagnosis report from the bundled sample failure artifact:
 python -m qa_copilot.cli --input reports/examples --output reports/latest/demo-ai-diagnosis.md
 ```
 
+Generate a dry-run PR comment preview from a diagnosis report:
+
+```powershell
+python -m qa_copilot.pr_comment --input reports/examples/sample-ai-diagnosis.md --output reports/latest/demo-pr-comment.md
+```
+
 See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
 
 See [docs/diagnosis-examples.md](docs/diagnosis-examples.md) for the curated Playwright, API, flaky-test, and fixture/setup failure examples.
@@ -183,6 +189,7 @@ This endpoint returns a redacted health summary. It does not expose API keys, ke
 - `reports/examples/flaky-search-failure.json`
 - `reports/examples/fixture-setup-failure.json`
 - `reports/examples/sample-ai-diagnosis.md`
+- `reports/examples/sample-pr-comment.md`
 
 ## Publish To GitHub
 

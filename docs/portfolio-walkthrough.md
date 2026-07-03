@@ -9,6 +9,7 @@ This walkthrough is the shortest path for showing AI QA Copilot in an interview 
 3. Run the bundled failure examples through the CLI.
 4. Open the generated report or the curated sample report.
 5. Explain the Failure Mode Matrix: it separates product/API bugs, contract drift, UI/E2E failures, flaky timing, and environment/setup failures.
+6. Optionally open the PR comment preview to show how the diagnosis could fit a code review workflow.
 
 ## Run The Demo App
 
@@ -72,6 +73,22 @@ reports/examples/sample-ai-diagnosis.md
 ```
 
 To regenerate the committed preview images, see [Screenshot Capture](screenshots.md).
+
+## Optional PR Comment Preview
+
+Turn the curated diagnosis report into a dry-run GitHub PR comment preview:
+
+```powershell
+python -m qa_copilot.pr_comment --input reports/examples/sample-ai-diagnosis.md --output reports/latest/demo-pr-comment.md
+```
+
+For a stable portfolio example, use:
+
+```text
+reports/examples/sample-pr-comment.md
+```
+
+This preview does not call the GitHub API, does not need a token, and does not post a real comment. It shows the next integration step: test failure artifacts become an AI diagnosis report, then a concise review comment.
 
 ## What To Show
 

@@ -9,6 +9,8 @@ SCREENSHOT_SCRIPT = Path("scripts/capture-portfolio-screenshots.ps1")
 RESUME_ZH = Path("docs/resume-zh.md")
 INTERVIEW_QA_ZH = Path("docs/interview-qa.md")
 INTERVIEW_WALKTHROUGH_ZH = Path("docs/interview-walkthrough-zh.md")
+DEMO_FLOW = Path("docs/demo-flow.md")
+SAMPLE_PR_COMMENT = Path("reports/examples/sample-pr-comment.md")
 VISUAL_ASSETS = (
     Path("docs/assets/provider-status.png"),
     Path("docs/assets/failure-mode-matrix.png"),
@@ -138,3 +140,28 @@ def test_chinese_walkthrough_is_a_three_minute_interview_script():
         "## 后续扩展方向",
     ):
         assert heading in walkthrough
+
+
+def test_pr_comment_preview_is_documented():
+    readme = README.read_text(encoding="utf-8")
+    walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
+    demo_flow = DEMO_FLOW.read_text(encoding="utf-8")
+
+    assert "python -m qa_copilot.pr_comment" in readme
+    assert "reports/examples/sample-pr-comment.md" in readme
+    assert "Optional PR Comment Preview" in walkthrough
+    assert "sample-pr-comment.md" in walkthrough
+    assert "PR comment preview" in demo_flow
+
+
+def test_sample_pr_comment_exists_and_is_safe():
+    text = SAMPLE_PR_COMMENT.read_text(encoding="utf-8")
+
+    assert "AI QA Copilot Diagnosis Preview" in text
+    assert "Dry-run PR comment preview" in text
+    assert "Failure Mode Matrix" in text
+    assert "Recommended next steps" in text
+    assert "reports/examples/sample-ai-diagnosis.md" in text
+    assert "Review comments before posting to public PRs" in text
+    assert "sk-" not in text
+    assert "Bearer " not in text
