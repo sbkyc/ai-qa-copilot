@@ -12,6 +12,7 @@ INTERVIEW_WALKTHROUGH_ZH = Path("docs/interview-walkthrough-zh.md")
 DEMO_FLOW = Path("docs/demo-flow.md")
 SAMPLE_PR_COMMENT = Path("reports/examples/sample-pr-comment.md")
 CI_WORKFLOW = Path(".github/workflows/ci.yml")
+CI_ARTIFACTS_DOC = Path("docs/ci-artifacts.md")
 VISUAL_ASSETS = (
     Path("docs/assets/provider-status.png"),
     Path("docs/assets/failure-mode-matrix.png"),
@@ -204,3 +205,36 @@ def test_docs_describe_ci_pr_comment_preview_artifact():
     assert "does not call the GitHub API" in combined
     assert "does not post a real" in combined
     assert "CI artifacts may still contain raw test logs or traces" in combined
+
+
+def test_readme_links_ci_artifacts_guide():
+    readme = README.read_text(encoding="utf-8")
+
+    assert "CI Artifacts" in readme
+    assert "qa-reports" in readme
+    assert "docs/ci-artifacts.md" in readme
+
+
+def test_ci_artifacts_guide_lists_key_outputs():
+    text = CI_ARTIFACTS_DOC.read_text(encoding="utf-8")
+
+    for phrase in (
+        "qa-reports",
+        "reports/latest/pytest-report.html",
+        "reports/latest/ai-diagnosis.md",
+        "reports/latest/pr-comment.md",
+        "reports/latest/failures/*.json",
+        "screenshots",
+        "traces",
+    ):
+        assert phrase in text
+
+
+def test_ci_artifacts_guide_explains_safety_boundary():
+    text = CI_ARTIFACTS_DOC.read_text(encoding="utf-8")
+
+    assert "basic redaction" in text
+    assert "raw test logs" in text
+    assert "traces" in text
+    assert "Review artifacts" in text
+    assert "proprietary systems" in text

@@ -73,3 +73,5 @@ The resulting report and PR comment preview are uploaded inside the `qa-reports`
 A future workflow can post that generated Markdown to GitHub, but posting is intentionally out of scope for the current demo.
 
 `pr-comment.md` applies basic redaction, but CI artifacts may still contain raw test logs or traces. Review artifacts before using this workflow with proprietary systems.
+
+For a file-by-file artifact guide, see [CI Artifacts](ci-artifacts.md).

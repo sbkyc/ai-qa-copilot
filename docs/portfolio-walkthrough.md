@@ -92,6 +92,8 @@ This preview does not call the GitHub API, does not need a token, and does not p
 
 In GitHub Actions, the same dry-run preview is uploaded as `reports/latest/pr-comment.md` inside the `qa-reports` artifact. It does not post a real PR comment.
 
+When showing CI, open the `qa-reports` artifact and point to `pytest-report.html`, `ai-diagnosis.md`, and `pr-comment.md`. See [CI Artifacts](ci-artifacts.md) for the file-by-file guide.
+
 ## What To Show
 
 Use the Failure Mode Matrix as the centerpiece:

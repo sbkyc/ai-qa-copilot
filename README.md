@@ -136,6 +136,12 @@ See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
 
 See [docs/diagnosis-examples.md](docs/diagnosis-examples.md) for the curated Playwright, API, flaky-test, and fixture/setup failure examples.
 
+## CI Artifacts
+
+GitHub Actions uploads a `qa-reports` artifact for each CI run. It includes the pytest HTML report, structured failure JSON, AI diagnosis report, and dry-run PR comment preview.
+
+See [CI Artifacts](docs/ci-artifacts.md) for the file-by-file guide.
+
 ## AI API Adapter
 
 The AI call is isolated behind a provider layer, so it can use OpenAI, DeepSeek, Qwen/DashScope, Kimi/Moonshot, SiliconFlow, OpenRouter, Doubao, or any OpenAI-compatible gateway through environment variables.
