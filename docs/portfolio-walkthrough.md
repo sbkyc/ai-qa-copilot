@@ -90,6 +90,8 @@ reports/examples/sample-pr-comment.md
 
 This preview does not call the GitHub API, does not need a token, and does not post a real comment. It shows the next integration step: test failure artifacts become an AI diagnosis report, then a concise review comment.
 
+In GitHub Actions, the same dry-run preview is uploaded as `reports/latest/pr-comment.md` inside the `qa-reports` artifact. It does not post a real PR comment.
+
 ## What To Show
 
 Use the Failure Mode Matrix as the centerpiece:

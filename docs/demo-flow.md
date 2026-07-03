@@ -62,12 +62,14 @@ GitHub Actions then runs:
 python -m qa_copilot.cli --input reports/latest/failures --output reports/latest/ai-diagnosis.md
 ```
 
-The resulting report is uploaded with the rest of the test artifacts.
-
-A future workflow can reuse the PR comment preview generator:
+It also generates a dry-run PR comment preview:
 
 ```powershell
 python -m qa_copilot.pr_comment --input reports/latest/ai-diagnosis.md --output reports/latest/pr-comment.md
 ```
 
-Posting that Markdown to GitHub is intentionally out of scope for the current demo.
+The resulting report and PR comment preview are uploaded inside the `qa-reports` artifact.
+
+A future workflow can post that generated Markdown to GitHub, but posting is intentionally out of scope for the current demo.
+
+`pr-comment.md` applies basic redaction, but CI artifacts may still contain raw test logs or traces. Review artifacts before using this workflow with proprietary systems.

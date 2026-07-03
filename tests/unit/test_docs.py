@@ -11,6 +11,7 @@ INTERVIEW_QA_ZH = Path("docs/interview-qa.md")
 INTERVIEW_WALKTHROUGH_ZH = Path("docs/interview-walkthrough-zh.md")
 DEMO_FLOW = Path("docs/demo-flow.md")
 SAMPLE_PR_COMMENT = Path("reports/examples/sample-pr-comment.md")
+CI_WORKFLOW = Path(".github/workflows/ci.yml")
 VISUAL_ASSETS = (
     Path("docs/assets/provider-status.png"),
     Path("docs/assets/failure-mode-matrix.png"),
@@ -166,3 +167,40 @@ def test_sample_pr_comment_exists_and_is_safe():
     assert "Review generated comments before posting to public PRs" in text
     assert "sk-" not in text
     assert "Bearer " not in text
+
+
+def test_ci_generates_pr_comment_preview_artifact():
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+
+    assert "Generate AI diagnosis" in workflow
+    assert "Generate PR comment preview" in workflow
+    assert "python -m qa_copilot.pr_comment" in workflow
+    assert "reports/latest/ai-diagnosis.md" in workflow
+    assert "reports/latest/pr-comment.md" in workflow
+    assert "actions/upload-artifact" in workflow
+    assert "path: reports/" in workflow
+    assert workflow.index("Generate AI diagnosis") < workflow.index(
+        "Generate PR comment preview"
+    )
+    assert workflow.index("Generate PR comment preview") < workflow.index("Upload reports")
+
+
+def test_ci_pr_comment_preview_stays_dry_run():
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+
+    assert "GITHUB_TOKEN" not in workflow
+    assert "github-script" not in workflow
+    assert "createComment" not in workflow
+
+
+def test_docs_describe_ci_pr_comment_preview_artifact():
+    readme = README.read_text(encoding="utf-8")
+    walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
+    demo_flow = DEMO_FLOW.read_text(encoding="utf-8")
+    combined = "\n".join((readme, walkthrough, demo_flow))
+
+    assert "reports/latest/pr-comment.md" in combined
+    assert "qa-reports" in combined
+    assert "does not call the GitHub API" in combined
+    assert "does not post a real" in combined
+    assert "CI artifacts may still contain raw test logs or traces" in combined

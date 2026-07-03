@@ -124,6 +124,14 @@ Generate a dry-run PR comment preview from a diagnosis report:
 python -m qa_copilot.pr_comment --input reports/examples/sample-ai-diagnosis.md --output reports/latest/demo-pr-comment.md
 ```
 
+CI also generates a dry-run PR comment preview at:
+
+```text
+reports/latest/pr-comment.md
+```
+
+It is uploaded inside the `qa-reports` artifact. It does not call the GitHub API or post a real PR comment.
+
 See [docs/demo-flow.md](docs/demo-flow.md) for the full demo flow.
 
 See [docs/diagnosis-examples.md](docs/diagnosis-examples.md) for the curated Playwright, API, flaky-test, and fixture/setup failure examples.
