@@ -17,8 +17,9 @@ def test_build_diagnosis_prompt_contains_failure_context():
     prompt = build_diagnosis_prompt([artifact])
 
     assert "expected 409 but got 500" in prompt
-    assert "Suspected root cause" in prompt
-    assert "test script bug" in prompt
+    assert "请用简体中文输出" in prompt
+    assert "候选根因 / 诊断假设" in prompt
+    assert "测试脚本问题" in prompt
 
 
 def test_build_diagnosis_prompt_groups_failure_modes():
@@ -51,7 +52,7 @@ def test_build_diagnosis_prompt_groups_failure_modes():
 
     prompt = build_diagnosis_prompt(artifacts)
 
-    assert "- Failure mode matrix" in prompt
+    assert "- Failure Mode Matrix（失败模式矩阵）" in prompt
     assert "Failure mode groups:" in prompt
     assert "### API contract" in prompt
     assert "### Flaky/timing" in prompt

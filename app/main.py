@@ -2,6 +2,7 @@ import os
 import sqlite3
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from html import escape
 from pathlib import Path
 from typing import Annotated
 
@@ -139,6 +140,221 @@ ARTIFACT_CARDS = [
     },
 ]
 
+REPORT_FALLBACK_PATH = Path("reports/examples/sample-ai-diagnosis.md")
+
+
+def _plain_markdown(text: str) -> str:
+    return (
+        text.replace("**", "")
+        .replace("`", "")
+        .replace("<br>", " ")
+        .replace("<br/>", " ")
+        .strip()
+    )
+
+
+def _split_markdown_table_row(line: str) -> list[str]:
+    return [_plain_markdown(cell) for cell in line.strip().strip("|").split("|")]
+
+
+def _find_latest_report_path() -> Path | None:
+    override = os.getenv("AI_QA_REPORT_PATH")
+    if override:
+        path = Path(override)
+        return path if path.is_file() else None
+
+    latest_dir = Path("reports/latest")
+    preferred_reports = [
+        latest_dir / "deepseek-ai-diagnosis-zh.md",
+        latest_dir / "deepseek-ai-diagnosis.md",
+        latest_dir / "ai-diagnosis-zh.md",
+        latest_dir / "ai-diagnosis.md",
+    ]
+    for path in preferred_reports:
+        if path.is_file():
+            return path
+
+    candidates = [
+        path
+        for path in latest_dir.glob("*diagnosis*.md")
+        if path.is_file() and path.name != "pr-comment.md"
+    ]
+    if candidates:
+        return max(candidates, key=lambda path: path.stat().st_mtime)
+    if REPORT_FALLBACK_PATH.is_file():
+        return REPORT_FALLBACK_PATH
+    return None
+
+
+def _extract_report_summary(markdown: str) -> str:
+    lines = markdown.splitlines()
+    for index, line in enumerate(lines):
+        if line.strip().lower() in {"## summary", "### summary", "## 摘要", "### 摘要"}:
+            summary_lines: list[str] = []
+            for candidate in lines[index + 1 :]:
+                stripped = candidate.strip()
+                if stripped.startswith("#"):
+                    break
+                if stripped and stripped != "---":
+                    summary_lines.append(_plain_markdown(stripped))
+            return " ".join(summary_lines).strip()
+    for line in lines:
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#") and stripped != "---":
+            return _plain_markdown(stripped)
+    return "报告已生成，可打开完整页面查看。"
+
+
+def _extract_report_matrix(markdown: str) -> list[dict[str, str]]:
+    lines = markdown.splitlines()
+    for index, line in enumerate(lines):
+        if ("Failure Mode" not in line and "失败模式" not in line) or "|" not in line:
+            continue
+        rows: list[dict[str, str]] = []
+        for candidate in lines[index + 2 :]:
+            if not candidate.strip().startswith("|"):
+                break
+            cells = _split_markdown_table_row(candidate)
+            if len(cells) < 5:
+                continue
+            rows.append(
+                {
+                    "mode": cells[0],
+                    "test": cells[1],
+                    "evidence": cells[2],
+                    "classification": cells[3],
+                    "next_action": cells[4],
+                }
+            )
+        return rows[:6]
+    return []
+
+
+def _render_inline_markdown(text: str) -> str:
+    parts = text.split("`")
+    rendered: list[str] = []
+    for index, part in enumerate(parts):
+        safe = escape(part)
+        if index % 2:
+            rendered.append(f"<code>{safe}</code>")
+        else:
+            rendered.append(safe)
+    joined = "".join(rendered)
+    while "**" in joined:
+        joined = joined.replace("**", "", 2)
+    return joined
+
+
+def _render_markdown_document(markdown: str) -> str:
+    html_parts: list[str] = []
+    lines = markdown.splitlines()
+    index = 0
+    while index < len(lines):
+        line = lines[index].rstrip()
+        stripped = line.strip()
+        if not stripped:
+            index += 1
+            continue
+        if stripped == "---":
+            html_parts.append("<hr>")
+            index += 1
+            continue
+        if stripped.startswith("|"):
+            table_lines: list[str] = []
+            while index < len(lines) and lines[index].strip().startswith("|"):
+                table_lines.append(lines[index].strip())
+                index += 1
+            if table_lines:
+                headers = _split_markdown_table_row(table_lines[0])
+                body_lines = [
+                    row
+                    for row in table_lines[2:]
+                    if not set(row.replace("|", "").strip()) <= {"-", ":"}
+                ]
+                html_parts.append(
+                    '<div class="report-table-scroll">'
+                    '<table class="matrix-table report-table">'
+                )
+                html_parts.append(
+                    "<thead><tr>"
+                    + "".join(f"<th>{_render_inline_markdown(header)}</th>" for header in headers)
+                    + "</tr></thead>"
+                )
+                html_parts.append("<tbody>")
+                for body_line in body_lines:
+                    cells = _split_markdown_table_row(body_line)
+                    html_parts.append(
+                        "<tr>"
+                        + "".join(f"<td>{_render_inline_markdown(cell)}</td>" for cell in cells)
+                        + "</tr>"
+                    )
+                html_parts.append("</tbody></table></div>")
+            continue
+        if stripped.startswith("#"):
+            level = min(len(stripped) - len(stripped.lstrip("#")), 3)
+            text = stripped[level:].strip()
+            html_parts.append(f"<h{level}>{_render_inline_markdown(text)}</h{level}>")
+            index += 1
+            continue
+        if stripped.startswith("- "):
+            html_parts.append("<ul>")
+            while index < len(lines) and lines[index].strip().startswith("- "):
+                item = lines[index].strip()[2:].strip()
+                html_parts.append(f"<li>{_render_inline_markdown(item)}</li>")
+                index += 1
+            html_parts.append("</ul>")
+            continue
+        if len(stripped) > 3 and stripped[0].isdigit() and ". " in stripped[:5]:
+            html_parts.append("<ol>")
+            while index < len(lines):
+                candidate = lines[index].strip()
+                if not (len(candidate) > 3 and candidate[0].isdigit() and ". " in candidate[:5]):
+                    break
+                item = candidate.split(". ", 1)[1]
+                html_parts.append(f"<li>{_render_inline_markdown(item)}</li>")
+                index += 1
+            html_parts.append("</ol>")
+            continue
+
+        paragraph_lines = [stripped]
+        index += 1
+        while index < len(lines):
+            candidate = lines[index].strip()
+            if (
+                not candidate
+                or candidate.startswith("#")
+                or candidate.startswith("|")
+                or candidate.startswith("- ")
+                or candidate == "---"
+                or (len(candidate) > 3 and candidate[0].isdigit() and ". " in candidate[:5])
+            ):
+                break
+            paragraph_lines.append(candidate)
+            index += 1
+        paragraph = " ".join(paragraph_lines)
+        html_parts.append(f"<p>{_render_inline_markdown(paragraph)}</p>")
+    return "\n".join(html_parts)
+
+
+def _latest_report_view_model() -> dict[str, object]:
+    path = _find_latest_report_path()
+    if path is None:
+        return {
+            "available": False,
+            "title": "最新 AI 诊断报告",
+            "summary": "还没有生成报告。连接 AI 服务后运行诊断，就会在这里展示。",
+            "matrix_rows": [],
+            "html": "",
+        }
+    markdown = path.read_text(encoding="utf-8")
+    return {
+        "available": True,
+        "title": "最新 AI 诊断报告",
+        "summary": _extract_report_summary(markdown),
+        "matrix_rows": _extract_report_matrix(markdown),
+        "html": _render_markdown_document(markdown),
+    }
+
 
 def _resolve_db_path(db_path: str | Path | None) -> str | Path:
     if db_path is not None:
@@ -187,6 +403,7 @@ def _dashboard_context(db: sqlite3.Connection) -> dict[str, object]:
         "pipeline_steps": DASHBOARD_PIPELINE_STEPS,
         "failure_mode_rows": FAILURE_MODE_ROWS,
         "artifact_cards": ARTIFACT_CARDS,
+        "latest_report": _latest_report_view_model(),
     }
 
 
@@ -301,6 +518,14 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             request,
             "dashboard.html",
             _dashboard_context(db),
+        )
+
+    @api.get("/diagnosis-report", response_class=HTMLResponse)
+    def diagnosis_report_page(request: Request) -> HTMLResponse:
+        return templates.TemplateResponse(
+            request,
+            "diagnosis_report.html",
+            {"latest_report": _latest_report_view_model()},
         )
 
     @api.get("/login", response_class=HTMLResponse)

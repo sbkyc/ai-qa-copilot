@@ -126,6 +126,50 @@
         </div>
       </section>
 
+      <section class="dashboard-section report-preview-panel" aria-labelledby="latest-report-title">
+        <div class="section-heading">
+          <h2 id="latest-report-title">{{ latest_report.title }}</h2>
+          <p>这是 AI 根据失败证据生成的可读报告，面试官打开页面就能看到诊断结果。</p>
+        </div>
+        <div class="report-preview-card">
+          <div class="report-preview-summary">
+            <strong>报告摘要</strong>
+            <p>{{ latest_report.summary }}</p>
+          </div>
+          {% if latest_report.matrix_rows %}
+            <div class="matrix-scroll report-preview-matrix">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>Failure Mode</th>
+                    <th>影响测试</th>
+                    <th>证据</th>
+                    <th>分类</th>
+                    <th>下一步</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in latest_report.matrix_rows %}
+                    <tr>
+                      <td>{{ row.mode }}</td>
+                      <td>{{ row.test }}</td>
+                      <td>{{ row.evidence }}</td>
+                      <td>{{ row.classification }}</td>
+                      <td>{{ row.next_action }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="boundary-note">还没有可展示的矩阵内容。生成 AI 诊断报告后，这里会自动更新。</p>
+          {% endif %}
+          <div class="report-preview-actions">
+            <a class="button-link" href="/diagnosis-report">查看完整 AI 报告</a>
+          </div>
+        </div>
+      </section>
+
       <section class="dashboard-two-column">
         <section class="panel provider-status provider-status-{{ 'ok' if provider_health.ok else 'warning' }}" aria-labelledby="dashboard-provider-title">
           <div class="provider-status-header">

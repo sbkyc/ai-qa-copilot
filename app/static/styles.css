@@ -395,6 +395,117 @@ body {
   gap: 18px;
 }
 
+.report-preview-panel,
+.report-page-panel {
+  padding: 22px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.report-preview-card {
+  display: grid;
+  gap: 18px;
+}
+
+.report-preview-summary {
+  padding: 18px;
+  border: 1px solid rgba(17, 124, 111, 0.2);
+  border-radius: 8px;
+  background: #f4fbf9;
+}
+
+.report-preview-summary strong {
+  color: var(--accent-dark);
+  font-size: 14px;
+}
+
+.report-preview-summary p {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.report-preview-matrix {
+  box-shadow: none;
+}
+
+.report-preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.report-document {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.report-document h1,
+.report-document h2,
+.report-document h3 {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.report-document h1 {
+  font-size: 30px;
+}
+
+.report-document h2 {
+  margin-top: 10px;
+  font-size: 24px;
+}
+
+.report-document h3 {
+  margin-top: 8px;
+  font-size: 19px;
+}
+
+.report-document p,
+.report-document li {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.report-document p,
+.report-document ul,
+.report-document ol {
+  margin: 0;
+}
+
+.report-document ul,
+.report-document ol {
+  padding-left: 22px;
+}
+
+.report-document code {
+  border-radius: 4px;
+  padding: 2px 5px;
+  background: #eef2f7;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.92em;
+}
+
+.report-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.report-table {
+  box-shadow: none;
+}
+
 .artifact-card strong {
   display: inline-flex;
   margin-top: 10px;

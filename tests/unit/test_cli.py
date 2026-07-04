@@ -14,7 +14,7 @@ def test_generate_report_writes_no_artifacts_message(tmp_path):
 
     generate_report(tmp_path / "missing", output)
 
-    assert "No failure artifacts were found." in output.read_text(encoding="utf-8")
+    assert "没有找到失败证据。" in output.read_text(encoding="utf-8")
 
 
 def test_generate_report_writes_diagnosis_for_failure_artifact(tmp_path, monkeypatch):
@@ -39,8 +39,8 @@ def test_generate_report_writes_diagnosis_for_failure_artifact(tmp_path, monkeyp
     generate_report(failures, output)
 
     report = output.read_text(encoding="utf-8")
-    assert "# AI Diagnosis Report" in report
-    assert "API key is not configured" in report
+    assert "# AI 诊断报告" in report
+    assert "未配置 AI 服务密钥" in report
 
 
 def test_cli_lists_supported_providers(monkeypatch, capsys):

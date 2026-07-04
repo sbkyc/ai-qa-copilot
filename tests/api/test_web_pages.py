@@ -85,6 +85,64 @@ def test_dashboard_provider_status_is_redacted(client, monkeypatch):
     assert "tenant.internal.example" not in response.text
 
 
+def test_dashboard_shows_latest_ai_report_preview(client, tmp_path, monkeypatch):
+    report = tmp_path / "latest-ai-diagnosis.md"
+    report.write_text(
+        """# AI 诊断报告
+
+## 摘要
+DeepSeek 根据失败证据识别出 API、UI、偶发时序和环境初始化问题。
+
+### Failure Mode Matrix（失败模式矩阵）
+
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+|---|---|---|---|---|
+| Product/API behavior | `test_stock` | 期望 409 | 产品缺陷 | 映射库存异常。 |
+| UI/E2E behavior | `test_checkout` | 按钮隐藏 | UI 状态问题 | 检查前置条件。 |
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("AI_QA_REPORT_PATH", str(report))
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "最新 AI 诊断报告" in response.text
+    assert "DeepSeek 根据失败证据识别出 API" in response.text
+    assert "Product/API behavior" in response.text
+    assert "test_stock" in response.text
+    assert "查看完整 AI 报告" in response.text
+    assert 'href="/diagnosis-report"' in response.text
+
+
+def test_diagnosis_report_page_renders_escaped_markdown(client, tmp_path, monkeypatch):
+    report = tmp_path / "latest-ai-diagnosis.md"
+    report.write_text(
+        """# AI 诊断报告
+
+## 摘要
+报告渲染应安全处理代码：`<script>alert("x")</script>`。
+
+### Failure Mode Matrix（失败模式矩阵）
+
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+|---|---|---|---|---|
+| API contract | `test_contract` | 422 validation error | 契约漂移 | 对齐请求 schema。 |
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("AI_QA_REPORT_PATH", str(report))
+
+    response = client.get("/diagnosis-report")
+
+    assert response.status_code == 200
+    assert "最新 AI 诊断报告" in response.text
+    assert "API contract" in response.text
+    assert "报告渲染应安全处理代码" in response.text
+    assert "<script>" not in response.text
+    assert "&lt;script&gt;" in response.text
+
+
 def test_login_page_renders(client):
     response = client.get("/login")
 

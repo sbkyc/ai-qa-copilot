@@ -42,19 +42,21 @@ def _group_by_failure_mode(
 
 def build_diagnosis_prompt(artifacts: list[FailureArtifact]) -> str:
     sections = [
-        "You are an AI QA copilot helping diagnose automated test failures.",
-        "Return a structured report with these headings:",
-        "- Summary",
-        "- Failure mode matrix",
-        "- Suspected root cause",
-        "- Reproduction steps",
-        "- Evidence",
-        "- Suggested fix",
-        "- Risk level",
-        "- Classification: product bug, test script bug, flaky test, or environment issue",
+        "你是一个 AI QA Copilot，负责辅助诊断自动化测试失败。",
+        "请用简体中文输出结构化 Markdown 报告。",
+        "技术名词、测试路径、HTTP 状态码、异常名和 failure mode 名称可以保留英文。",
+        "报告必须包含这些二级标题：",
+        "- 摘要",
+        "- Failure Mode Matrix（失败模式矩阵）",
+        "- 候选根因 / 诊断假设",
+        "- 复现步骤",
+        "- 证据",
+        "- 修复建议",
+        "- 风险等级",
+        "- 分类：产品缺陷、测试脚本问题、偶发/时序问题、环境问题",
         "",
-        "In the failure mode matrix, include columns for failure mode, affected test, "
-        "evidence, likely classification, and next action.",
+        "Failure Mode Matrix 表格必须包含这些列：失败模式、影响测试、证据、可能分类、下一步。",
+        "请避免把候选根因写成已确认根因；用“可能”“候选”“诊断假设”这类措辞。",
         "",
         "Failure mode groups:",
     ]
@@ -77,7 +79,7 @@ def build_diagnosis_prompt(artifacts: list[FailureArtifact]) -> str:
         sections.extend(
             [
                 "",
-                "No failure artifacts were provided.",
+                "没有提供失败证据。",
             ]
         )
     return "\n".join(sections)

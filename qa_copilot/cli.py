@@ -17,14 +17,14 @@ def generate_report(input_path: str | Path, output_path: str | Path) -> None:
     if not artifacts:
         write_markdown_report(
             Path(output_path),
-            "AI Diagnosis Report",
-            "## Summary\n\nNo failure artifacts were found.\n",
+            "AI 诊断报告",
+            "## 摘要\n\n没有找到失败证据。\n",
         )
         return
 
     prompt = build_diagnosis_prompt(artifacts)
     body = diagnose_with_ai(prompt)
-    write_markdown_report(Path(output_path), "AI Diagnosis Report", body)
+    write_markdown_report(Path(output_path), "AI 诊断报告", body)
 
 
 def main() -> None:

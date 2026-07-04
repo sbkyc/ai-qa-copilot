@@ -81,6 +81,32 @@ def test_build_pr_comment_includes_failure_mode_matrix_summary():
     assert "tests/api/test_orders_api.py::test_create_order" in comment
 
 
+def test_build_pr_comment_extracts_chinese_report_sections():
+    diagnosis = """
+# AI 诊断报告
+
+## 摘要
+
+失败证据显示 API 契约和 UI 状态都需要检查。
+
+## Failure Mode Matrix（失败模式矩阵）
+
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+| --- | --- | --- | --- | --- |
+| API contract | `test_contract` | 422 validation error | 契约漂移 | 对齐 schema。 |
+
+## 修复建议
+
+- 先对齐请求体和响应 schema。
+"""
+
+    comment = build_pr_comment(diagnosis)
+
+    assert "失败证据显示 API 契约" in comment
+    assert "API contract" in comment
+    assert "先对齐请求体" in comment
+
+
 def test_build_pr_comment_handles_report_without_matrix():
     comment = build_pr_comment("# AI Diagnosis Report\n\n## Summary\n\nNo failures.")
 

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>最新 AI 诊断报告</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">AI QA Copilot</a>
+      <nav class="topbar-nav" aria-label="主导航">
+        <a href="/">Dashboard</a>
+        <a href="/login">Demo Shop</a>
+        <a href="/diagnosis-report" aria-current="page">AI Report</a>
+      </nav>
+    </header>
+
+    <main class="dashboard-shell">
+      <section class="dashboard-section report-page-panel" aria-labelledby="report-page-title">
+        <div class="section-heading">
+          <div>
+            <h1 id="report-page-title">最新 AI 诊断报告</h1>
+            <p>这里展示 AI 根据自动化测试失败证据生成的完整诊断内容。</p>
+          </div>
+          <a class="button-link button-link-secondary" href="/">返回 Dashboard</a>
+        </div>
+
+        {% if latest_report.available %}
+          <article class="report-document">
+            {{ latest_report.html | safe }}
+          </article>
+        {% else %}
+          <div class="report-preview-card">
+            <p>{{ latest_report.summary }}</p>
+            <a class="button-link" href="/">返回 Dashboard</a>
+          </div>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

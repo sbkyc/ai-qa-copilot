@@ -9,33 +9,39 @@ from qa_copilot.providers import (
 
 
 def fallback_report(reason: str) -> str:
-    return f"""## Summary
+    return f"""## 摘要
 
-AI diagnosis was skipped because {reason}.
+AI 诊断已跳过，原因：{reason}。
 
-## Suspected root cause
+## Failure Mode Matrix（失败模式矩阵）
 
-Review the pytest failure artifact manually.
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+| --- | --- | --- | --- | --- |
+| Environment/setup | 当前诊断流程 | {reason} | 环境问题 | 检查 AI 服务配置后重新生成报告。 |
 
-## Reproduction steps
+## 候选根因 / 诊断假设
 
-Run the failing pytest node shown in the failure artifact.
+AI 服务当前不可用，需要人工查看 pytest 失败证据。
 
-## Evidence
+## 复现步骤
 
-The local pytest report and JSON failure artifact are available in reports/latest.
+运行失败证据中记录的 pytest 节点。
 
-## Suggested fix
+## 证据
 
-Inspect the failed assertion, request payload, response body, and browser trace.
+本地测试报告和结构化失败证据已生成。
 
-## Risk level
+## 修复建议
 
-Unknown
+检查失败断言、请求参数、响应内容和浏览器调试附件。
 
-## Classification
+## 风险等级
 
-environment issue
+未知。
+
+## 分类
+
+环境问题
 """
 
 
@@ -47,11 +53,11 @@ def diagnose_with_ai(
     resolved_config = config or DiagnosisProviderConfig.from_env()
     missing_config, config_errors = provider_config_issues(resolved_config)
     if config_errors:
-        return fallback_report(", ".join(config_errors))
+        return fallback_report(f"AI 服务配置错误：{', '.join(config_errors)}")
     if "api_key" in missing_config:
-        return fallback_report("API key is not configured")
+        return fallback_report("未配置 AI 服务密钥")
     if missing_config:
-        return fallback_report(f"provider config is missing: {', '.join(missing_config)}")
+        return fallback_report(f"AI 服务配置缺失：{', '.join(missing_config)}")
 
     try:
         resolved_provider = provider or create_diagnosis_provider(resolved_config)

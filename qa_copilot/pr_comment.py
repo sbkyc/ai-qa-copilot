@@ -79,15 +79,18 @@ def build_pr_comment(
     *,
     artifact_hint: str = DEFAULT_ARTIFACT_HINT,
 ) -> str:
-    summary = extract_section(diagnosis_markdown, "Summary") or (
+    summary = _first_available_section(diagnosis_markdown, ("Summary", "摘要", "总结")) or (
         "No summary was found in the diagnosis report."
     )
-    matrix = extract_section(diagnosis_markdown, "Failure Mode Matrix") or (
+    matrix = _first_available_section(
+        diagnosis_markdown,
+        ("Failure Mode Matrix", "Failure Mode Matrix（失败模式矩阵）", "失败模式矩阵"),
+    ) or (
         "_No failure mode matrix was found in the diagnosis report._"
     )
     recommended_steps = _first_available_section(
         diagnosis_markdown,
-        ("Recommended next steps", "Suggested fix", "Suggested fixes"),
+        ("Recommended next steps", "Suggested fix", "Suggested fixes", "修复建议", "下一步"),
     )
 
     comment = f"""## AI QA Copilot Diagnosis Preview
