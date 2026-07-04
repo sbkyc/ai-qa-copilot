@@ -39,19 +39,19 @@ from qa_copilot.providers import supported_provider_specs
 templates = Jinja2Templates(directory="app/templates")
 
 PROVIDER_ISSUE_LABELS = {
-    "api_key": "缺少 API key",
-    "base_url": "缺少服务地址",
+    "api_key": "AI 服务未连接",
+    "base_url": "AI 服务未连接",
     "model": "缺少模型配置",
     "unsupported_provider": "不支持的 AI 服务",
-    "unsupported_api_style": "不支持的 API 类型",
+    "unsupported_api_style": "AI 服务配置需检查",
 }
 
 PROVIDER_ISSUE_HINTS = {
-    "api_key": "配置 AI 服务密钥。",
-    "base_url": "为兼容网关配置服务地址。",
+    "api_key": "如需现场生成诊断，请先连接 AI 服务。",
+    "base_url": "如需使用兼容网关，请先完成服务连接配置。",
     "model": "为当前 AI 服务配置模型。",
     "unsupported_provider": "检查 AI 服务名称是否拼写正确。",
-    "unsupported_api_style": "检查 API 调用类型配置。",
+    "unsupported_api_style": "检查 AI 服务调用方式配置。",
 }
 
 DASHBOARD_VALUE_CARDS = [

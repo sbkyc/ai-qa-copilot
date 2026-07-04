@@ -20,7 +20,7 @@ def test_user_can_login_and_create_order(page: Page, live_server: str):
     expect(page.get_by_role("heading", name="商品列表")).to_be_visible()
     provider_status = page.get_by_role("region", name="AI 服务状态")
     expect(provider_status.get_by_role("heading", name="AI 服务状态")).to_be_visible()
-    expect(provider_status.locator(".provider-status-summary")).to_have_text("缺少 API key")
+    expect(provider_status.locator(".provider-status-summary")).to_have_text("AI 服务未连接")
     first_product = page.get_by_role("article").filter(has_text="无线鼠标")
     first_product.get_by_role("button", name="创建订单").click()
 
