@@ -15,8 +15,8 @@ def test_dashboard_page_renders_portfolio_story(client):
     assert "AI 自动化测试与缺陷诊断平台" in response.text
     assert "pytest / Playwright" in response.text
     assert "Failure Mode Matrix" in response.text
-    assert "qa-reports" in response.text
-    assert "demo-qa-reports" in response.text
+    assert "CI 报告包" in response.text
+    assert "演示报告包" in response.text
 
 
 def test_dashboard_explains_ai_and_artifact_boundaries(client):
@@ -25,9 +25,31 @@ def test_dashboard_explains_ai_and_artifact_boundaries(client):
     assert response.status_code == 200
     assert "候选根因" in response.text
     assert "诊断假设" in response.text
-    assert "不调用 GitHub PR/Issues API" in response.text
-    assert "不会自动评论 PR" in response.text
-    assert "curated demo artifact" in response.text
+    assert "安全演示样例" in response.text
+    assert "不展示密钥或内部配置" in response.text
+    assert "不代表当前真实故障" in response.text
+
+
+def test_dashboard_hides_internal_implementation_details(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    for phrase in (
+        "API Docs",
+        "Provider Health API",
+        "GitHub PR/Issues API",
+        "raw logs",
+        "stack traces",
+        "provider preset",
+        "reports/latest",
+        "reports/examples",
+        "qa-reports",
+        "demo-qa-reports",
+        "pytest-report.html",
+        "failure JSON",
+        "pr-comment.md",
+    ):
+        assert phrase not in response.text
 
 
 def test_dashboard_explains_interview_demo_path(client):
@@ -37,7 +59,7 @@ def test_dashboard_explains_interview_demo_path(client):
     assert "面试演示路径" in response.text
     assert "先看 Dashboard" in response.text
     assert "进入 Demo Shop 下单" in response.text
-    assert "再看 qa-reports" in response.text
+    assert "再看 CI 报告包" in response.text
     assert "下单流程只是被测业务场景" in response.text
 
 
@@ -105,11 +127,38 @@ def test_order_success_page_explains_qa_next_steps(client):
     assert "这一步证明 Demo Shop 是真实被测系统" in response.text
     assert "下单成功不是终点" in response.text
     assert "如果这里失败" in response.text
-    assert "failure JSON" in response.text
-    assert "AI diagnosis" in response.text
-    assert "pr-comment.md" in response.text
+    assert "失败证据" in response.text
+    assert "AI 诊断" in response.text
+    assert "PR 摘要预览" in response.text
     assert "返回 Dashboard" in response.text
     assert "继续测试下单" in response.text
+
+
+def test_order_success_page_hides_file_paths_and_raw_api_links(client):
+    client.cookies.set("qa_user", "alice")
+
+    response = client.post("/orders", data={"product_id": "1", "quantity": "1"})
+
+    assert response.status_code == 200
+    for phrase in (
+        "API Docs",
+        "Provider Health API",
+        "reports/latest",
+        "reports/examples",
+        "pr-comment.md",
+    ):
+        assert phrase not in response.text
+
+
+def test_demo_pages_hide_api_docs_nav(client):
+    login_response = client.get("/login")
+    client.cookies.set("qa_user", "alice")
+    products_response = client.get("/products")
+
+    assert login_response.status_code == 200
+    assert products_response.status_code == 200
+    assert "API Docs" not in login_response.text
+    assert "API Docs" not in products_response.text
 
 
 def test_products_page_shows_redacted_provider_status(client, monkeypatch):
@@ -141,8 +190,8 @@ def test_products_page_shows_missing_base_url_provider_status(client, monkeypatc
 
     assert response.status_code == 200
     assert "AI 服务状态" in response.text
-    assert "缺少 base URL" in response.text
-    assert "为 OpenAI-compatible 网关配置 AI_BASE_URL。" in response.text
+    assert "缺少服务地址" in response.text
+    assert "为兼容网关配置服务地址。" in response.text
 
 
 def test_products_page_shows_unsupported_provider_status(client, monkeypatch):
@@ -154,8 +203,8 @@ def test_products_page_shows_unsupported_provider_status(client, monkeypatch):
 
     assert response.status_code == 200
     assert "AI 服务状态" in response.text
-    assert "不支持的 provider" in response.text
-    assert "检查 AI_PROVIDER 是否拼写正确。" in response.text
+    assert "不支持的 AI 服务" in response.text
+    assert "检查 AI 服务名称是否拼写正确。" in response.text
     assert "fake-key" not in response.text
 
 
@@ -169,6 +218,6 @@ def test_products_page_shows_unsupported_api_style_status(client, monkeypatch):
 
     assert response.status_code == 200
     assert "AI 服务状态" in response.text
-    assert "不支持的 API style" in response.text
-    assert "使用 AI_API_STYLE=chat 或 AI_API_STYLE=responses。" in response.text
+    assert "不支持的 API 类型" in response.text
+    assert "检查 API 调用类型配置。" in response.text
     assert "fake-deepseek-key" not in response.text
