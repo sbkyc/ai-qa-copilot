@@ -137,16 +137,16 @@
           </div>
           <dl class="provider-status-meta">
             <div>
-              <dt>AI 服务商</dt>
+              <dt>AI 服务</dt>
               <dd>{{ provider_health.provider }}</dd>
             </div>
             <div>
-              <dt>API 风格</dt>
-              <dd>{{ provider_health.api_style }}</dd>
+              <dt>连接状态</dt>
+              <dd>{{ provider_health.status_label }}</dd>
             </div>
             <div>
-              <dt>密钥状态</dt>
-              <dd>{{ '已配置' if provider_health.api_key_configured else '缺失' }}</dd>
+              <dt>安全展示</dt>
+              <dd>隐藏内部配置</dd>
             </div>
           </dl>
           {% if provider_health.issues %}

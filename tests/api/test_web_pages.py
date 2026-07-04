@@ -76,7 +76,9 @@ def test_dashboard_provider_status_is_redacted(client, monkeypatch):
     assert "AI 服务状态" in response.text
     assert "已就绪" in response.text
     assert "openai-compatible" in response.text
-    assert "chat" in response.text
+    assert "隐藏内部配置" in response.text
+    assert "API 风格" not in response.text
+    assert "密钥状态" not in response.text
     assert "fake-gateway-key" not in response.text
     assert "AI_API_KEY" not in response.text
     assert "tenant-routed-model" not in response.text
@@ -174,7 +176,9 @@ def test_products_page_shows_redacted_provider_status(client, monkeypatch):
     assert "AI 服务状态" in response.text
     assert "已就绪" in response.text
     assert "openai-compatible" in response.text
-    assert "chat" in response.text
+    assert "隐藏内部配置" in response.text
+    assert "API 风格" not in response.text
+    assert "密钥状态" not in response.text
     assert "fake-gateway-key" not in response.text
     assert "AI_API_KEY" not in response.text
     assert "tenant-routed-model" not in response.text
@@ -190,8 +194,8 @@ def test_products_page_shows_missing_base_url_provider_status(client, monkeypatc
 
     assert response.status_code == 200
     assert "AI 服务状态" in response.text
-    assert "缺少服务地址" in response.text
-    assert "为兼容网关配置服务地址。" in response.text
+    assert "AI 服务未连接" in response.text
+    assert "如需使用兼容网关，请先完成服务连接配置。" in response.text
 
 
 def test_products_page_shows_unsupported_provider_status(client, monkeypatch):
@@ -218,6 +222,6 @@ def test_products_page_shows_unsupported_api_style_status(client, monkeypatch):
 
     assert response.status_code == 200
     assert "AI 服务状态" in response.text
-    assert "不支持的 API 类型" in response.text
-    assert "检查 API 调用类型配置。" in response.text
+    assert "AI 服务配置需检查" in response.text
+    assert "检查 AI 服务调用方式配置。" in response.text
     assert "fake-deepseek-key" not in response.text
