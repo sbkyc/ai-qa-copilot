@@ -22,7 +22,9 @@ def test_dashboard_page_renders_portfolio_story(client):
     assert "失败证据样例" in response.text
 
 
-def test_dashboard_explains_ai_and_artifact_boundaries(client):
+def test_dashboard_explains_ai_and_artifact_boundaries(client, tmp_path, monkeypatch):
+    monkeypatch.setenv("AI_QA_REPORT_PATH", str(tmp_path / "missing-report.md"))
+
     response = client.get("/")
 
     assert response.status_code == 200
