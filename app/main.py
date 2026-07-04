@@ -55,41 +55,76 @@ PROVIDER_ISSUE_HINTS = {
     "unsupported_api_style": "检查 AI 服务调用方式配置。",
 }
 
-DASHBOARD_VALUE_CARDS = [
+TEST_COVERAGE_CARDS = [
     {
-        "title": "端到端 QA 自动化",
+        "title": "API 接口测试",
+        "badge": "pytest / FastAPI TestClient",
         "body": (
-            "FastAPI 被测系统配合 pytest API/service tests 与 Playwright E2E，"
-            "覆盖从接口到浏览器的关键路径。"
+            "验证登录、商品查询、订单创建、库存不足和错误响应，"
+            "重点看状态码、响应体和边界条件。"
         ),
+        "checks": [
+            "鉴权失败返回 401",
+            "库存不足返回 409",
+            "商品不存在返回 404",
+            "请求体验证返回 422",
+        ],
     },
     {
-        "title": "失败证据链",
+        "title": "Service 业务规则测试",
+        "badge": "pytest unit/service",
         "body": (
-            "测试失败会沉淀测试报告、结构化失败证据，以及可用时的浏览器截图或调试附件。"
+            "绕开页面直接验证核心业务规则，保证库存扣减、用户认证和订单状态"
+            "不依赖浏览器才能发现问题。"
         ),
+        "checks": ["认证逻辑", "库存扣减", "订单状态", "异常分支"],
     },
     {
-        "title": "AI 辅助诊断",
-        "body": "把失败上下文组织成 Failure Mode Matrix，输出证据、分类、候选根因和下一步建议。",
+        "title": "浏览器 E2E 测试",
+        "badge": "Playwright",
+        "body": (
+            "覆盖真实用户路径：进入系统、登录、查看商品、创建订单。"
+            "它证明被测系统不是静态页面，而是可自动化验证的业务流程。"
+        ),
+        "checks": ["登录流程", "商品列表", "创建订单", "错误提示"],
     },
     {
-        "title": "AI 服务安全边界",
-        "body": "AI 服务状态可观察，但不展示密钥或内部配置。",
+        "title": "CI 验证链路",
+        "badge": "GitHub Actions",
+        "body": (
+            "每次提交自动跑 lint、API 测试、E2E 测试，并保留报告产物，"
+            "面试时能证明测试不是只在本机跑过。"
+        ),
+        "checks": ["Ruff", "pytest", "Playwright", "诊断报告"],
+    },
+]
+
+INTERVIEW_REVIEW_CARDS = [
+    {
+        "title": "你测了什么",
+        "body": "页面把 API、Service、E2E 和 CI 分开展示，避免只说“我写了自动化测试”。",
     },
     {
-        "title": "CI 作品集产物",
-        "body": "真实 CI 报告包与安全演示报告包，让面试官不用复现失败，也能看到完整 QA 交付物。",
+        "title": "失败怎么定位",
+        "body": "失败样例会展示 phase、测试节点、关键证据和可能责任边界，方便讲定位思路。",
+    },
+    {
+        "title": "AI 有什么价值",
+        "body": "AI 报告只做辅助归类和候选根因，不替代 pytest / Playwright 的质量门禁。",
+    },
+    {
+        "title": "安全边界在哪里",
+        "body": "页面只展示连接状态和脱敏摘要，不展示密钥、内部地址或运行时配置来源。",
     },
 ]
 
 DASHBOARD_PIPELINE_STEPS = [
-    "pytest / Playwright",
+    "被测业务路径",
+    "自动化断言",
     "结构化失败证据",
-    "AI 诊断",
+    "中文 AI 诊断",
     "Failure Mode Matrix",
-    "PR 摘要预览",
-    "CI 报告包",
+    "团队 Review 摘要",
 ]
 
 FAILURE_MODE_ROWS = [
@@ -390,18 +425,99 @@ def _provider_health_view_model() -> dict[str, object]:
     }
 
 
+def _dashboard_ai_mode_view_model(
+    provider_health: dict[str, object],
+) -> dict[str, object]:
+    if provider_health["ok"]:
+        return {
+            "ok": True,
+            "status_label": "实时 AI 已连接",
+            "mode_label": "可现场生成中文诊断",
+            "body": "已连接实时 AI 诊断能力，页面仍隐藏密钥、模型和内部地址。",
+        }
+
+    issue_labels = {
+        str(issue["label"])
+        for issue in provider_health["issues"]
+        if isinstance(issue, dict) and "label" in issue
+    }
+    if issue_labels.difference({"AI 服务未连接"}):
+        return {
+            "ok": False,
+            "status_label": "AI 配置需检查",
+            "mode_label": "本地报告可用",
+            "body": "现场生成前需要检查 AI 配置；Dashboard 仍可展示安全样例和已生成报告。",
+        }
+
+    return {
+        "ok": False,
+        "status_label": "本地 fallback 模式",
+        "mode_label": "不影响面试演示",
+        "body": "未连接实时 AI 时，仍可展示安全样例、fallback 报告和完整测试证据链。",
+    }
+
+
+def _failure_mode_display(artifact: FailureArtifact) -> tuple[str, str]:
+    keywords = {keyword.lower() for keyword in artifact.keywords}
+    phase = artifact.phase.lower()
+    if phase == "setup" or keywords.intersection({"fixture", "setup"}):
+        return "环境 / fixture 问题", "说明失败发生在测试前置阶段，不应误判为业务缺陷。"
+    if "flaky" in keywords:
+        return "偶发 / 时序问题", "说明自动化测试需要关注等待条件、异步请求和稳定性。"
+    if keywords.intersection({"api-assertion", "contract"}):
+        return "API 契约问题", "说明接口请求体、响应 schema 或前后端契约发生漂移。"
+    if keywords.intersection({"playwright", "e2e", "visibility"}):
+        return "UI / E2E 行为问题", "说明浏览器路径能捕获用户实际看得到的页面状态问题。"
+    if "api" in keywords:
+        return "产品 / API 行为问题", "说明接口状态码、业务异常映射或服务端处理不符合预期。"
+    return "未分类失败", "说明需要先补充 keywords 或失败上下文，才能稳定归因。"
+
+
+def _short_failure_evidence(longrepr: str) -> str:
+    for line in longrepr.splitlines():
+        stripped = line.strip()
+        if stripped:
+            return stripped[:160]
+    return "失败证据为空，需要检查测试产物采集逻辑。"
+
+
+def _display_test_name(nodeid: str) -> str:
+    return nodeid.rsplit("::", 1)[-1].replace("_", " ")
+
+
+def _failure_evidence_cards(artifacts: list[FailureArtifact]) -> list[dict[str, str]]:
+    cards: list[dict[str, str]] = []
+    for artifact in artifacts[:6]:
+        mode, qa_value = _failure_mode_display(artifact)
+        cards.append(
+            {
+                "mode": mode,
+                "test_name": _display_test_name(artifact.nodeid),
+                "phase": artifact.phase,
+                "evidence": _short_failure_evidence(artifact.longrepr),
+                "qa_value": qa_value,
+            }
+        )
+    return cards
+
+
 def _dashboard_context(db: sqlite3.Connection) -> dict[str, object]:
     sample_artifacts = load_failure_artifacts("reports/examples")
     provider_specs = supported_provider_specs()
+    provider_health = _provider_health_view_model()
     return {
-        "provider_health": _provider_health_view_model(),
+        "provider_health": provider_health,
+        "ai_mode": _dashboard_ai_mode_view_model(provider_health),
         "product_count": len(list_products(db)),
+        "coverage_count": len(TEST_COVERAGE_CARDS),
         "sample_artifact_count": len(sample_artifacts),
         "provider_count": len(provider_specs),
         "provider_names": list(provider_specs),
-        "value_cards": DASHBOARD_VALUE_CARDS,
+        "coverage_cards": TEST_COVERAGE_CARDS,
+        "review_cards": INTERVIEW_REVIEW_CARDS,
         "pipeline_steps": DASHBOARD_PIPELINE_STEPS,
         "failure_mode_rows": FAILURE_MODE_ROWS,
+        "failure_evidence_cards": _failure_evidence_cards(sample_artifacts),
         "artifact_cards": ARTIFACT_CARDS,
         "latest_report": _latest_report_view_model(),
     }

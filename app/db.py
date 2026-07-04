@@ -28,6 +28,17 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 """
 
+DEMO_USERS = [
+    ("alice", "password123"),
+    ("bob", "password123"),
+]
+
+DEMO_PRODUCTS = [
+    (1, "无线鼠标", 2599, 10),
+    (2, "机械键盘", 7999, 5),
+    (3, "USB-C 扩展坞", 4299, 8),
+]
+
 
 def connect(db_path: str | Path) -> sqlite3.Connection:
     connection = sqlite3.connect(str(db_path), check_same_thread=False)
@@ -41,20 +52,21 @@ def initialize_database(connection: sqlite3.Connection) -> None:
 
 
 def seed_database(connection: sqlite3.Connection) -> None:
-    user_count = connection.execute("SELECT COUNT(*) AS count FROM users").fetchone()["count"]
-    if user_count:
-        return
-
     connection.executemany(
-        "INSERT INTO users (username, password) VALUES (?, ?)",
-        [("alice", "password123"), ("bob", "password123")],
+        """
+        INSERT INTO users (username, password) VALUES (?, ?)
+        ON CONFLICT(username) DO UPDATE SET password = excluded.password
+        """,
+        DEMO_USERS,
     )
     connection.executemany(
-        "INSERT INTO products (name, price_cents, stock) VALUES (?, ?, ?)",
-        [
-            ("无线鼠标", 2599, 10),
-            ("机械键盘", 7999, 5),
-            ("USB-C 扩展坞", 4299, 8),
-        ],
+        """
+        INSERT INTO products (id, name, price_cents, stock) VALUES (?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          name = excluded.name,
+          price_cents = excluded.price_cents,
+          stock = excluded.stock
+        """,
+        DEMO_PRODUCTS,
     )
     connection.commit()

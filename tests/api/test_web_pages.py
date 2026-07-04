@@ -12,11 +12,14 @@ def test_dashboard_page_renders_portfolio_story(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "AI 自动化测试与缺陷诊断平台" in response.text
-    assert "pytest / Playwright" in response.text
-    assert "Failure Mode Matrix" in response.text
-    assert "CI 报告包" in response.text
-    assert "演示报告包" in response.text
+    assert "自动化测试证据中心" in response.text
+    assert "测试覆盖设计" in response.text
+    assert "API 接口测试" in response.text
+    assert "Service 业务规则测试" in response.text
+    assert "浏览器 E2E 测试" in response.text
+    assert "pytest / FastAPI TestClient" in response.text
+    assert "Playwright" in response.text
+    assert "失败证据样例" in response.text
 
 
 def test_dashboard_explains_ai_and_artifact_boundaries(client):
@@ -56,14 +59,14 @@ def test_dashboard_explains_interview_demo_path(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "面试演示路径" in response.text
-    assert "先看 Dashboard" in response.text
-    assert "进入 Demo Shop 下单" in response.text
-    assert "再看 CI 报告包" in response.text
-    assert "下单流程只是被测业务场景" in response.text
+    assert "面试官阅读顺序" in response.text
+    assert "看测试覆盖" in response.text
+    assert "体验 Demo Shop" in response.text
+    assert "看失败诊断" in response.text
+    assert "登录和下单只是被测业务路径" in response.text
 
 
-def test_dashboard_provider_status_is_redacted(client, monkeypatch):
+def test_dashboard_ai_mode_card_is_redacted(client, monkeypatch):
     clear_provider_env(monkeypatch)
     monkeypatch.setenv("AI_PROVIDER", "openai-compatible")
     monkeypatch.setenv("AI_API_KEY", "fake-gateway-key")
@@ -73,16 +76,26 @@ def test_dashboard_provider_status_is_redacted(client, monkeypatch):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "AI 服务状态" in response.text
-    assert "已就绪" in response.text
-    assert "openai-compatible" in response.text
+    assert "AI 诊断模式" in response.text
+    assert "实时 AI 已连接" in response.text
+    assert "可现场生成中文诊断" in response.text
     assert "隐藏内部配置" in response.text
+    assert "openai-compatible" not in response.text
     assert "API 风格" not in response.text
     assert "密钥状态" not in response.text
     assert "fake-gateway-key" not in response.text
     assert "AI_API_KEY" not in response.text
     assert "tenant-routed-model" not in response.text
     assert "tenant.internal.example" not in response.text
+
+
+def test_dashboard_presents_fallback_mode_without_broken_provider_warning(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "AI 诊断模式" in response.text
+    assert "本地 fallback 模式" in response.text
+    assert "AI 服务未连接" not in response.text
 
 
 def test_dashboard_shows_latest_ai_report_preview(client, tmp_path, monkeypatch):
@@ -107,11 +120,11 @@ DeepSeek 根据失败证据识别出 API、UI、偶发时序和环境初始化�
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "最新 AI 诊断报告" in response.text
+    assert "中文 AI 诊断报告" in response.text
     assert "DeepSeek 根据失败证据识别出 API" in response.text
     assert "Product/API behavior" in response.text
     assert "test_stock" in response.text
-    assert "查看完整 AI 报告" in response.text
+    assert "查看完整中文 AI 报告" in response.text
     assert 'href="/diagnosis-report"' in response.text
 
 
@@ -136,7 +149,7 @@ def test_diagnosis_report_page_renders_escaped_markdown(client, tmp_path, monkey
     response = client.get("/diagnosis-report")
 
     assert response.status_code == 200
-    assert "最新 AI 诊断报告" in response.text
+    assert "中文 AI 诊断报告" in response.text
     assert "API contract" in response.text
     assert "报告渲染应安全处理代码" in response.text
     assert "<script>" not in response.text
@@ -186,11 +199,12 @@ def test_order_success_page_explains_qa_next_steps(client):
     assert "订单创建成功" in response.text
     assert "这一步证明 Demo Shop 是真实被测系统" in response.text
     assert "下单成功不是终点" in response.text
-    assert "如果这里失败" in response.text
+    assert "真正的项目价值不在买商品" in response.text
     assert "失败证据" in response.text
-    assert "AI 诊断" in response.text
-    assert "PR 摘要预览" in response.text
+    assert "中文 AI 诊断报告" in response.text
+    assert "测试覆盖设计" in response.text
     assert "返回 Dashboard" in response.text
+    assert "查看中文 AI 报告" in response.text
     assert "继续测试下单" in response.text
 
 

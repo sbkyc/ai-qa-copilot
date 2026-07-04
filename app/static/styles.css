@@ -223,11 +223,154 @@ body {
 
 .value-card p,
 .artifact-card p,
-.provider-list p {
+.provider-list p,
+.coverage-card p,
+.review-card p,
+.evidence-card p,
+.tested-system-card p {
   margin: 10px 0 0;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.65;
+}
+
+.coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.coverage-card,
+.review-card,
+.evidence-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.coverage-card {
+  border-top: 4px solid var(--accent);
+}
+
+.coverage-card:nth-child(2) {
+  border-top-color: var(--blue);
+}
+
+.coverage-card:nth-child(3) {
+  border-top-color: var(--violet);
+}
+
+.coverage-card:nth-child(4) {
+  border-top-color: var(--amber);
+}
+
+.coverage-card strong,
+.evidence-card strong,
+.artifact-card strong {
+  color: var(--accent-dark);
+  font-size: 13px;
+}
+
+.coverage-card h3,
+.review-card h3,
+.evidence-card h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.check-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.check-list li {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--surface-soft);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.review-card {
+  border-top: 3px solid var(--blue);
+}
+
+.review-card:nth-child(2) {
+  border-top-color: var(--accent);
+}
+
+.review-card:nth-child(3) {
+  border-top-color: var(--violet);
+}
+
+.review-card:nth-child(4) {
+  border-top-color: var(--amber);
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.evidence-card {
+  align-content: start;
+}
+
+.evidence-card dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.evidence-card dl div {
+  padding: 12px;
+  border-radius: 6px;
+  background: #fbfcfe;
+}
+
+.evidence-card dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.evidence-card dd {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.tested-system-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.tested-system-card h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
 }
 
 .pipeline-panel {
@@ -921,6 +1064,9 @@ button:hover,
   }
 
   .value-grid,
+  .coverage-grid,
+  .review-grid,
+  .evidence-grid,
   .demo-path-steps,
   .result-next-grid,
   .pipeline-steps {
