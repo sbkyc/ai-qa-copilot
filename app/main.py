@@ -40,18 +40,18 @@ templates = Jinja2Templates(directory="app/templates")
 
 PROVIDER_ISSUE_LABELS = {
     "api_key": "缺少 API key",
-    "base_url": "缺少 base URL",
-    "model": "缺少 model",
-    "unsupported_provider": "不支持的 provider",
-    "unsupported_api_style": "不支持的 API style",
+    "base_url": "缺少服务地址",
+    "model": "缺少模型配置",
+    "unsupported_provider": "不支持的 AI 服务",
+    "unsupported_api_style": "不支持的 API 类型",
 }
 
 PROVIDER_ISSUE_HINTS = {
-    "api_key": "配置 AI_API_KEY 或对应服务商的专用 key。",
-    "base_url": "为 OpenAI-compatible 网关配置 AI_BASE_URL。",
-    "model": "为当前 provider 配置 AI_MODEL。",
-    "unsupported_provider": "检查 AI_PROVIDER 是否拼写正确。",
-    "unsupported_api_style": "使用 AI_API_STYLE=chat 或 AI_API_STYLE=responses。",
+    "api_key": "配置 AI 服务密钥。",
+    "base_url": "为兼容网关配置服务地址。",
+    "model": "为当前 AI 服务配置模型。",
+    "unsupported_provider": "检查 AI 服务名称是否拼写正确。",
+    "unsupported_api_style": "检查 API 调用类型配置。",
 }
 
 DASHBOARD_VALUE_CARDS = [
@@ -65,8 +65,7 @@ DASHBOARD_VALUE_CARDS = [
     {
         "title": "失败证据链",
         "body": (
-            "测试失败会沉淀 pytest HTML report、failure JSON，以及可用时的 "
-            "screenshots / traces。"
+            "测试失败会沉淀测试报告、结构化失败证据，以及可用时的浏览器截图或调试附件。"
         ),
     },
     {
@@ -74,22 +73,22 @@ DASHBOARD_VALUE_CARDS = [
         "body": "把失败上下文组织成 Failure Mode Matrix，输出证据、分类、候选根因和下一步建议。",
     },
     {
-        "title": "Provider 安全边界",
-        "body": "AI 服务状态可观察，但不暴露 API key、base URL、model 或 key source。",
+        "title": "AI 服务安全边界",
+        "body": "AI 服务状态可观察，但不展示密钥或内部配置。",
     },
     {
         "title": "CI 作品集产物",
-        "body": "qa-reports 与 demo-qa-reports 让面试官不用复现失败，也能看到完整 QA 交付物。",
+        "body": "真实 CI 报告包与安全演示报告包，让面试官不用复现失败，也能看到完整 QA 交付物。",
     },
 ]
 
 DASHBOARD_PIPELINE_STEPS = [
     "pytest / Playwright",
-    "failure JSON",
-    "AI diagnosis",
+    "结构化失败证据",
+    "AI 诊断",
     "Failure Mode Matrix",
-    "dry-run PR comment preview",
-    "qa-reports",
+    "PR 摘要预览",
+    "CI 报告包",
 ]
 
 FAILURE_MODE_ROWS = [
@@ -127,17 +126,16 @@ FAILURE_MODE_ROWS = [
 
 ARTIFACT_CARDS = [
     {
-        "title": "qa-reports",
-        "kind": "真实 CI artifact",
+        "title": "CI 报告包",
+        "kind": "真实 CI 产物",
         "body": (
-            "push / pull_request CI 上传的测试报告、failure JSON、AI diagnosis "
-            "和 dry-run PR comment preview。"
+            "CI 上传的测试报告、结构化失败证据、AI 诊断和 PR 摘要预览。"
         ),
     },
     {
-        "title": "demo-qa-reports",
-        "kind": "workflow_dispatch curated demo artifact",
-        "body": "基于 reports/examples 的稳定面试演示产物，不代表本次真实 CI 失败。",
+        "title": "演示报告包",
+        "kind": "手动生成的安全演示报告包",
+        "body": "基于安全示例数据生成，适合稳定面试展示，不代表当前真实故障。",
     },
 ]
 

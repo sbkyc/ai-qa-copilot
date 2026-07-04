@@ -12,7 +12,6 @@
       <nav class="topbar-nav" aria-label="主导航">
         <a href="/" aria-current="page">Dashboard</a>
         <a href="/login">Demo Shop</a>
-        <a href="/docs">API Docs</a>
       </nav>
     </header>
 
@@ -21,12 +20,12 @@
         <div class="dashboard-hero-copy">
           <h1 id="dashboard-title">AI 自动化测试与缺陷诊断平台</h1>
           <p>
-            把 pytest / Playwright 测试失败转成 failure artifacts、AI diagnosis、
-            Failure Mode Matrix 和 CI artifacts，让自动化测试结果更容易审阅和复盘。
+            把 pytest / Playwright 测试失败转成失败证据、AI 诊断、
+            Failure Mode Matrix 和 CI 报告产物，让自动化测试结果更容易审阅和复盘。
           </p>
           <div class="hero-actions">
             <a class="button-link" href="/login">进入 Demo Shop</a>
-            <a class="button-link button-link-secondary" href="/api/provider-health">查看 Provider Health API</a>
+            <a class="button-link button-link-secondary" href="#demo-path-title">查看演示路径</a>
           </div>
         </div>
         <aside class="hero-summary" aria-label="项目实时概览">
@@ -35,11 +34,11 @@
             <strong>{{ product_count }}</strong>
           </div>
           <div>
-            <span>示例 failure artifacts</span>
+            <span>示例失败证据</span>
             <strong>{{ sample_artifact_count }}</strong>
           </div>
           <div>
-            <span>支持 Provider</span>
+            <span>支持 AI 服务</span>
             <strong>{{ provider_count }}</strong>
           </div>
         </aside>
@@ -53,15 +52,15 @@
         <ol class="demo-path-steps">
           <li>
             <strong>先看 Dashboard</strong>
-            <span>用 30 秒说明自动化测试、失败证据链、AI diagnosis 和 CI artifacts。</span>
+            <span>用 30 秒说明自动化测试、失败证据链、AI 诊断和 CI 报告产物。</span>
           </li>
           <li>
             <strong>进入 Demo Shop 下单</strong>
             <span>下单流程只是被测业务场景，用来验证登录、商品、库存和订单链路。</span>
           </li>
           <li>
-            <strong>再看 qa-reports</strong>
-            <span>如果测试失败，CI 会保留 pytest-report.html、failure JSON、AI diagnosis 和 pr-comment.md。</span>
+            <strong>再看 CI 报告包</strong>
+            <span>如果测试失败，CI 会保留测试报告、失败证据、AI 诊断和 PR 摘要预览。</span>
           </li>
         </ol>
       </section>
@@ -84,7 +83,7 @@
       <section class="dashboard-section pipeline-panel" aria-labelledby="pipeline-title">
         <div class="section-heading">
           <h2 id="pipeline-title">测试失败证据链</h2>
-          <p>把测试结果沉淀成结构化证据，再进入 AI 辅助诊断和 dry-run PR comment preview。</p>
+          <p>把测试结果沉淀成结构化证据，再进入 AI 辅助诊断和 PR 摘要预览。</p>
         </div>
         <ol class="pipeline-steps">
           {% for step in pipeline_steps %}
@@ -99,7 +98,7 @@
       <section class="dashboard-section matrix-panel" aria-labelledby="matrix-title">
         <div class="section-heading">
           <h2 id="matrix-title">Failure Mode Matrix 示例</h2>
-          <p>示例来自 reports/examples，是 curated demo data，用于稳定展示诊断结构，不代表本次真实 CI 失败。</p>
+          <p>以下是安全演示样例，用于稳定展示诊断结构，不代表当前真实故障。</p>
         </div>
         <div class="matrix-scroll">
           <table class="matrix-table">
@@ -161,13 +160,13 @@
             </ul>
           {% endif %}
           <p class="boundary-note">
-            Provider Status 只展示 readiness，不暴露 API key、base URL、model 或 key source。
+            AI 服务状态只展示连接是否可用，不展示密钥或内部配置。
           </p>
         </section>
 
         <section class="panel provider-list" aria-labelledby="provider-list-title">
-          <h2 id="provider-list-title">Provider adapter 覆盖</h2>
-          <p>当前支持 {{ provider_count }} 个 provider preset，Dashboard 只展示名称，不展示运行时密钥来源。</p>
+          <h2 id="provider-list-title">AI 服务适配范围</h2>
+          <p>当前支持 {{ provider_count }} 种 AI 服务配置，Dashboard 只展示服务名称，不展示运行时密钥来源。</p>
           <ul>
             {% for provider in provider_names %}
               <li>{{ provider }}</li>
@@ -178,8 +177,8 @@
 
       <section class="dashboard-section" aria-labelledby="artifact-title">
         <div class="section-heading">
-          <h2 id="artifact-title">CI artifact 边界</h2>
-          <p>dry-run PR comment preview 不调用 GitHub PR/Issues API，也不会自动评论 PR。</p>
+          <h2 id="artifact-title">报告产物</h2>
+          <p>CI 会保留测试报告、AI 诊断报告和 PR 摘要预览，方便面试时说明完整证据链。</p>
         </div>
         <div class="artifact-grid">
           {% for artifact in artifact_cards %}
@@ -191,7 +190,7 @@
           {% endfor %}
         </div>
         <p class="boundary-note">
-          完整 artifacts 可能包含 raw logs、screenshots、traces 或 stack traces；用于 proprietary systems 前必须人工 review。
+          真实企业日志公开前需要人工检查；面试页面只展示安全摘要。
         </p>
       </section>
     </main>
