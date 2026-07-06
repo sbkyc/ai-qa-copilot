@@ -118,6 +118,36 @@ INTERVIEW_REVIEW_CARDS = [
     },
 ]
 
+INTERVIEW_SCORECARDS = [
+    {
+        "title": "测试设计",
+        "grade": "可面试展示",
+        "body": "API / Service / E2E / CI 分层明确，能说明每层测试解决的质量风险。",
+    },
+    {
+        "title": "失败证据",
+        "grade": "证据链完整",
+        "body": "失败会沉淀结构化 artifact、可读报告和 review 摘要，不只停留在红绿灯。",
+    },
+    {
+        "title": "AI 价值",
+        "grade": "辅助诊断",
+        "body": "AI 输出 Failure Mode Matrix、候选根因 / 诊断假设和下一步，不替代测试门禁。",
+    },
+    {
+        "title": "安全边界",
+        "grade": "可公开讲",
+        "body": "公开页面不展示密钥、内部地址、模型名或 key source，只展示脱敏状态和安全摘要。",
+    },
+]
+
+INTERVIEW_REVIEW_STEPS = [
+    "先看 Dashboard，确认项目不是电商 Demo，而是自动化测试证据中心。",
+    "再看测试覆盖，说明 API / Service / E2E / CI 各自验证什么。",
+    "进入 Demo Shop 下单，证明被测系统有真实登录、商品、库存和订单路径。",
+    "最后看中文 AI 报告，讲 Failure Mode Matrix、证据、候选根因和下一步建议。",
+]
+
 DASHBOARD_PIPELINE_STEPS = [
     "被测业务路径",
     "自动化断言",
@@ -523,6 +553,21 @@ def _dashboard_context(db: sqlite3.Connection) -> dict[str, object]:
     }
 
 
+def _interview_review_context(db: sqlite3.Connection) -> dict[str, object]:
+    sample_artifacts = load_failure_artifacts("reports/examples")
+    provider_health = _provider_health_view_model()
+    return {
+        "ai_mode": _dashboard_ai_mode_view_model(provider_health),
+        "product_count": len(list_products(db)),
+        "scorecards": INTERVIEW_SCORECARDS,
+        "coverage_cards": TEST_COVERAGE_CARDS,
+        "pipeline_steps": DASHBOARD_PIPELINE_STEPS,
+        "review_steps": INTERVIEW_REVIEW_STEPS,
+        "failure_evidence_cards": _failure_evidence_cards(sample_artifacts),
+        "latest_report": _latest_report_view_model(),
+    }
+
+
 def create_app(db_path: str | Path | None = None) -> FastAPI:
     resolved_db_path = _resolve_db_path(db_path)
 
@@ -642,6 +687,14 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             request,
             "diagnosis_report.html",
             {"latest_report": _latest_report_view_model()},
+        )
+
+    @api.get("/interview-review", response_class=HTMLResponse)
+    def interview_review_page(request: Request, db: DbConnection) -> HTMLResponse:
+        return templates.TemplateResponse(
+            request,
+            "interview_review.html",
+            _interview_review_context(db),
         )
 
     @api.get("/login", response_class=HTMLResponse)

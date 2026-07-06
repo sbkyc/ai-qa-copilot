@@ -66,6 +66,30 @@ def test_dashboard_explains_interview_demo_path(client):
     assert "体验 Demo Shop" in response.text
     assert "看失败诊断" in response.text
     assert "登录和下单只是被测业务路径" in response.text
+    assert 'href="/interview-review"' in response.text
+
+
+def test_interview_review_page_explains_project_value(client):
+    response = client.get("/interview-review")
+
+    assert response.status_code == 200
+    assert "面试官审阅模式" in response.text
+    assert "我会怎么审这个项目" in response.text
+    assert "测试证据链" in response.text
+    assert "API / Service / E2E / CI" in response.text
+    assert "Failure Mode Matrix" in response.text
+    assert "安全边界" in response.text
+    assert "3 分钟讲解顺序" in response.text
+    assert "候选根因 / 诊断假设" in response.text
+    for phrase in (
+        "API Docs",
+        "Provider Health API",
+        "reports/latest",
+        "reports/examples",
+        "raw logs",
+        "stack traces",
+    ):
+        assert phrase not in response.text
 
 
 def test_dashboard_ai_mode_card_is_redacted(client, monkeypatch):

@@ -14,7 +14,9 @@ AI QA Copilot is a Python portfolio project that combines automated testing and 
 
 ## Portfolio Walkthrough
 
-For a 3-minute interview path, start with the Chinese Showcase Dashboard at `/`, enter the Demo Shop at `/login`, run the bundled diagnosis examples, and show the Failure Mode Matrix in the sample report.
+For a 3-minute interview path, start with the Chinese Showcase Dashboard at `/`, open the interviewer review page at `/interview-review`, enter the Demo Shop at `/login`, and finish with the Failure Mode Matrix in the AI report.
+
+The `/interview-review` page is the fastest reviewer-facing path: it summarizes test coverage, the failure evidence chain, AI diagnosis boundaries, and the 3-minute talk track in one place.
 
 See [Portfolio Walkthrough](docs/portfolio-walkthrough.md) for the step-by-step demo script.
 

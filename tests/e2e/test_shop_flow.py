@@ -16,6 +16,9 @@ def test_user_can_login_and_create_order(page: Page, live_server: str):
     expect(ai_mode.locator(".provider-status-summary")).to_have_text(
         "本地 fallback 模式"
     )
+    page.get_by_role("link", name="面试官审阅模式").click()
+    expect(page.get_by_role("heading", name="面试官审阅模式")).to_be_visible()
+    expect(page.get_by_role("heading", name="测试证据链")).to_be_visible()
     page.get_by_role("link", name="体验被测系统").click()
 
     expect(page.get_by_role("heading", name="AI QA 演示商店")).to_be_visible()

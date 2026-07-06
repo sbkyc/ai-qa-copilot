@@ -47,6 +47,7 @@ def test_readme_links_portfolio_walkthrough():
     assert "[Portfolio Walkthrough](docs/portfolio-walkthrough.md)" in readme
     assert "3-minute interview path" in readme
     assert "Chinese Showcase Dashboard" in readme
+    assert "/interview-review" in readme
     assert "http://127.0.0.1:8000/login" in readme
 
 
@@ -213,6 +214,8 @@ def test_chinese_demo_script_explains_order_flow_and_next_steps():
     script = INTERVIEW_DEMO_SCRIPT_ZH.read_text(encoding="utf-8")
 
     for phrase in (
+        "面试官审阅模式",
+        "/interview-review",
         "买商品只是被测业务场景",
         "下单成功不是终点",
         "Dashboard -> Demo Shop order -> QA reports",

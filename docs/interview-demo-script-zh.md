@@ -9,12 +9,12 @@
 ## 3 分钟演示路线
 
 1. 打开本地 Dashboard：`http://127.0.0.1:8000`
-2. 用 30 秒讲清平台能力：端到端 QA 自动化、失败证据链、AI 辅助诊断、Provider 安全边界、CI 作品集产物。
-3. 点击“进入 Demo Shop”，登录 `alice / password123`。
+2. 点击“面试官审阅模式”：`/interview-review`，用 30 秒讲清测试覆盖、测试证据链、AI 辅助诊断和安全边界。
+3. 点击“体验被测系统”，登录 `alice / password123`。
 4. 创建一笔订单，进入“订单创建成功”页面。
 5. 解释：下单不是项目终点，它只是一个真实被测业务场景，用来让 Playwright E2E 覆盖登录、商品、库存和订单链路。
-6. 回到 Dashboard 或打开 `qa-reports`，说明如果登录或下单失败，项目会保留 `pytest-report.html`、`failure JSON`、`ai-diagnosis.md` 和 `pr-comment.md`。
-7. 打开 `reports/examples/sample-ai-diagnosis.md`，重点讲 Failure Mode Matrix。
+6. 打开中文 AI 报告，说明如果登录或下单失败，项目会保留测试报告、failure JSON、AI diagnosis 和 PR comment preview。
+7. 重点讲 Failure Mode Matrix：分类、证据、候选根因 / 诊断假设和下一步建议。
 
 英文压缩版可以讲成：Dashboard -> Demo Shop order -> QA reports -> AI diagnosis -> PR comment preview。
 
@@ -23,6 +23,19 @@
 可以这样说：
 
 > 这个首页不是营销页，而是面试展示入口。它把项目拆成五个能力：自动化测试、失败证据链、AI diagnosis、Provider 安全边界和 CI artifact。面试官不用先读代码，也能在 30 秒内看懂项目主线。
+
+## 面试官审阅模式怎么讲
+
+可以这样说：
+
+> 如果面试官时间很短，我会直接打开 `/interview-review`。这个页面按面试官视角组织：先看我测了什么，再看测试证据链，然后看 Failure Mode Matrix 和安全边界。它不是新增业务功能，而是把自动化测试项目的证据集中展示出来。
+
+这个页面要强调：
+
+- “我会怎么审这个项目”回答面试官的评估标准。
+- “测试证据链”说明 API / Service / E2E / CI 如何串起来。
+- “3 分钟讲解顺序”就是现场演示路线。
+- “安全边界”说明 AI 报告和 provider 状态不会泄漏敏感配置。
 
 如果面试官问“这些数据是真的吗”，可以回答：
 
