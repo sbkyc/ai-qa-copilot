@@ -472,6 +472,39 @@ def _extract_report_matrix(markdown: str) -> list[dict[str, str]]:
     return []
 
 
+def _report_guidance_view_model(
+    matrix_rows: list[dict[str, str]],
+) -> dict[str, object]:
+    if not matrix_rows:
+        return {
+            "has_matrix": False,
+            "row_count": 0,
+            "primary_mode": "暂无矩阵",
+            "primary_test": "先从工作台选择示例场景并生成报告。",
+            "next_action": "生成报告后，这里会提示优先关注的失败模式。",
+            "example_url": "/",
+        }
+
+    primary = matrix_rows[0]
+    mode = primary.get("mode", "未分类失败")
+    example_map = {
+        "接口契约": "api_contract",
+        "UI/E2E 行为": "ui_e2e",
+        "偶发/时序": "flaky_timing",
+        "环境/初始化": "environment_setup",
+        "产品/API 行为": "api_contract",
+    }
+    example_id = example_map.get(mode, "api_contract")
+    return {
+        "has_matrix": True,
+        "row_count": len(matrix_rows),
+        "primary_mode": mode,
+        "primary_test": primary.get("test", "未识别测试"),
+        "next_action": primary.get("next_action", "先查看证据和失败阶段。"),
+        "example_url": f"/?example={example_id}",
+    }
+
+
 def _render_inline_markdown(text: str) -> str:
     text = _localize_report_text(text)
     parts = text.split("`")
@@ -592,14 +625,17 @@ def _latest_report_view_model(path: Path | None = None) -> dict[str, object]:
             "title": "最新 AI 诊断报告",
             "summary": "还没有生成报告。连接 AI 服务后运行诊断，就会在这里展示。",
             "matrix_rows": [],
+            "guidance": _report_guidance_view_model([]),
             "html": "",
         }
     markdown = path.read_text(encoding="utf-8")
+    matrix_rows = _extract_report_matrix(markdown)
     return {
         "available": True,
         "title": "最新 AI 诊断报告",
         "summary": _extract_report_summary(markdown),
-        "matrix_rows": _extract_report_matrix(markdown),
+        "matrix_rows": matrix_rows,
+        "guidance": _report_guidance_view_model(matrix_rows),
         "html": _render_markdown_document(markdown),
     }
 

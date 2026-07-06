@@ -418,6 +418,37 @@ def test_diagnosis_report_page_renders_escaped_markdown(client, tmp_path, monkey
     assert "&lt;script&gt;" in response.text
 
 
+def test_diagnosis_report_page_shows_usage_guidance(client, tmp_path, monkeypatch):
+    report = tmp_path / "latest-ai-diagnosis.md"
+    report.write_text(
+        """# AI 诊断报告
+
+## 摘要
+接口契约失败需要优先处理。
+
+### Failure Mode Matrix（失败模式矩阵）
+
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+|---|---|---|---|---|
+| API contract | `test_contract` | 422 validation error | 契约漂移 | 对齐请求 schema。 |
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("AI_QA_REPORT_PATH", str(report))
+
+    response = client.get("/diagnosis-report")
+
+    assert response.status_code == 200
+    assert "报告使用建议" in response.text
+    assert "先看失败模式矩阵" in response.text
+    assert "优先关注：接口契约" in response.text
+    assert "建议动作：对齐请求 schema。" in response.text
+    assert "回到工作台换场景" in response.text
+    assert 'href="/?example=api_contract"' in response.text
+    assert "面试官审阅模式" in response.text
+    assert 'href="/interview-review"' in response.text
+
+
 def test_diagnosis_report_page_localizes_common_english_report_terms(
     client, tmp_path, monkeypatch
 ):

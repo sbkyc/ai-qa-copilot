@@ -810,6 +810,62 @@ body {
   gap: 12px;
 }
 
+.report-guidance-card {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid rgba(17, 124, 111, 0.22);
+  border-radius: 8px;
+  background: #f4fbf9;
+}
+
+.report-guidance-card h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 20px;
+}
+
+.report-guidance-card p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.report-guidance-meta {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 10px;
+  margin: 0;
+}
+
+.report-guidance-meta div {
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.report-guidance-meta dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.report-guidance-meta dd {
+  margin: 6px 0 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.report-guidance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .report-document {
   display: grid;
   gap: 14px;
@@ -1369,6 +1425,7 @@ button:hover,
     .review-two-column,
     .form-row,
     .evidence-grid,
+    .report-guidance-meta,
   .demo-path-steps,
   .result-next-grid,
   .pipeline-steps {

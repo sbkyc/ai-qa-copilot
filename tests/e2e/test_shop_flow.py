@@ -22,7 +22,7 @@ def test_user_can_login_and_create_order(page: Page, live_server: str):
     page.get_by_role("button", name="生成中文诊断报告").click()
 
     expect(page.get_by_role("heading", name="中文 AI 诊断报告")).to_be_visible()
-    expect(page.get_by_text("失败模式矩阵", exact=False)).to_be_visible()
+    expect(page.get_by_role("heading", name="失败模式矩阵")).to_be_visible()
 
     page.goto(live_server)
     page.get_by_role("link", name="示例被测系统").click()
