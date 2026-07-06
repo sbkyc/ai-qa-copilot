@@ -47,6 +47,14 @@
                 <dd>建议动作：{{ latest_report.guidance.next_action }}</dd>
               </div>
             </dl>
+            <div class="report-talk-track" aria-labelledby="report-talk-track-title">
+              <h3 id="report-talk-track-title">面试讲解摘要</h3>
+              <ol>
+                {% for item in latest_report.guidance.talk_track %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ol>
+            </div>
             <div class="report-guidance-actions">
               <a class="button-link" href="{{ latest_report.guidance.example_url }}">回到工作台换场景</a>
               <a class="button-link button-link-secondary" href="/interview-review">面试官审阅模式</a>

@@ -449,6 +449,36 @@ def test_diagnosis_report_page_shows_usage_guidance(client, tmp_path, monkeypatc
     assert 'href="/interview-review"' in response.text
 
 
+def test_diagnosis_report_page_shows_interview_talk_track(
+    client, tmp_path, monkeypatch
+):
+    report = tmp_path / "latest-ai-diagnosis.md"
+    report.write_text(
+        """# AI 诊断报告
+
+## 摘要
+UI 流程失败需要结合截图和 trace 排查。
+
+### Failure Mode Matrix（失败模式矩阵）
+
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+|---|---|---|---|---|
+| UI/E2E behavior | `test_checkout` | button hidden | UI 状态问题 | 检查前置条件。 |
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("AI_QA_REPORT_PATH", str(report))
+
+    response = client.get("/diagnosis-report")
+
+    assert response.status_code == 200
+    assert "面试讲解摘要" in response.text
+    assert "这次失败优先看 UI/E2E 行为" in response.text
+    assert "关键证据是 button hidden" in response.text
+    assert "下一步我会检查前置条件。" in response.text
+    assert "这不是让 AI 直接下结论，而是把失败证据整理成可复查的判断路径。" in response.text
+
+
 def test_diagnosis_report_page_localizes_common_english_report_terms(
     client, tmp_path, monkeypatch
 ):

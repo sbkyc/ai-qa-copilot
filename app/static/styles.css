@@ -866,6 +866,32 @@ body {
   gap: 12px;
 }
 
+.report-talk-track {
+  padding: 14px;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.report-talk-track h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.report-talk-track ol {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+
+.report-talk-track li {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
 .report-document {
   display: grid;
   gap: 14px;

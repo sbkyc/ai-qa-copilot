@@ -481,12 +481,20 @@ def _report_guidance_view_model(
             "row_count": 0,
             "primary_mode": "暂无矩阵",
             "primary_test": "先从工作台选择示例场景并生成报告。",
+            "evidence": "暂无证据",
             "next_action": "生成报告后，这里会提示优先关注的失败模式。",
             "example_url": "/",
+            "talk_track": [
+                "先从工作台选择示例场景并生成报告。",
+                "报告生成后，再结合失败模式、证据和下一步建议讲定位思路。",
+                "这不是让 AI 直接下结论，而是把失败证据整理成可复查的判断路径。",
+            ],
         }
 
     primary = matrix_rows[0]
     mode = primary.get("mode", "未分类失败")
+    evidence = primary.get("evidence", "未提取到关键证据")
+    next_action = primary.get("next_action", "先查看证据和失败阶段。")
     example_map = {
         "接口契约": "api_contract",
         "UI/E2E 行为": "ui_e2e",
@@ -500,8 +508,15 @@ def _report_guidance_view_model(
         "row_count": len(matrix_rows),
         "primary_mode": mode,
         "primary_test": primary.get("test", "未识别测试"),
-        "next_action": primary.get("next_action", "先查看证据和失败阶段。"),
+        "evidence": evidence,
+        "next_action": next_action,
         "example_url": f"/?example={example_id}",
+        "talk_track": [
+            f"这次失败优先看 {mode}。",
+            f"关键证据是 {evidence}。",
+            f"下一步我会{next_action}",
+            "这不是让 AI 直接下结论，而是把失败证据整理成可复查的判断路径。",
+        ],
     }
 
 
