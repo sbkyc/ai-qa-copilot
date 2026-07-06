@@ -10,10 +10,10 @@
     <header class="topbar">
       <a class="brand" href="/">AI QA Copilot</a>
       <nav class="topbar-nav" aria-label="主导航">
-        <a href="/" aria-current="page">Workbench</a>
-        <a href="/diagnosis-report">AI Report</a>
-        <a href="/login">Demo Shop</a>
-        <a href="/interview-review">Review</a>
+        <a href="/" aria-current="page">工作台</a>
+        <a href="/diagnosis-report">AI 报告</a>
+        <a href="/login">示例系统</a>
+        <a href="/interview-review">审阅模式</a>
       </nav>
     </header>
 
@@ -23,7 +23,7 @@
           <h1 id="workbench-title">AI QA 诊断工作台</h1>
           <p>
             粘贴 pytest / Playwright / API 失败日志，生成中文诊断报告。
-            输出会包含 Failure Mode Matrix、证据、候选根因 / 诊断假设和下一步建议。
+            输出会包含失败模式矩阵、证据、候选根因 / 诊断假设和下一步建议。
           </p>
         </div>
         <aside class="panel provider-status provider-status-{{ 'ok' if ai_mode.ok else 'warning' }}" aria-labelledby="dashboard-ai-mode-title">
@@ -59,7 +59,7 @@
           <div class="section-heading">
             <div>
               <h2 id="diagnosis-form-title">生成诊断</h2>
-              <p>面试官可以直接粘贴失败日志试用；没有实时 AI 配置时会生成 fallback 报告。公开演示请避免粘贴公司内部敏感日志。</p>
+              <p>面试官可以直接粘贴失败日志试用；没有实时 AI 配置时会生成备用报告。公开演示请避免粘贴公司内部敏感日志。</p>
             </div>
           </div>
           <form class="diagnosis-form" method="post" action="/diagnose">
@@ -71,9 +71,9 @@
               <label for="phase">
                 失败阶段
                 <select id="phase" name="phase">
-                  <option value="call">call</option>
-                  <option value="setup">setup</option>
-                  <option value="teardown">teardown</option>
+                  <option value="call">执行阶段</option>
+                  <option value="setup">准备阶段</option>
+                  <option value="teardown">清理阶段</option>
                 </select>
               </label>
               <label for="keywords">
@@ -101,7 +101,7 @@ response body: {"detail": [{"loc": ["body", "quantity"], "msg": "Field required"
           </p>
           <dl class="sample-log-list">
             <div>
-              <dt>API contract</dt>
+              <dt>接口契约</dt>
               <dd>请求体缺字段，返回 422。</dd>
             </div>
             <div>
@@ -109,11 +109,11 @@ response body: {"detail": [{"loc": ["body", "quantity"], "msg": "Field required"
               <dd>按钮不可见、页面状态未满足。</dd>
             </div>
             <div>
-              <dt>Flaky / timing</dt>
+              <dt>偶发/时序</dt>
               <dd>同一用例多次运行偶发失败。</dd>
             </div>
             <div>
-              <dt>Environment/setup</dt>
+              <dt>环境/初始化</dt>
               <dd>fixture、数据库或环境初始化失败。</dd>
             </div>
           </dl>
@@ -139,7 +139,7 @@ response body: {"detail": [{"loc": ["body", "quantity"], "msg": "Field required"
               <table class="matrix-table">
                 <thead>
                   <tr>
-                    <th>Failure Mode</th>
+                    <th>失败模式</th>
                     <th>影响测试</th>
                     <th>证据</th>
                     <th>分类</th>

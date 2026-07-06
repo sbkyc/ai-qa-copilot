@@ -10,10 +10,10 @@
     <header class="topbar">
       <a class="brand" href="/">AI QA Copilot</a>
       <nav class="topbar-nav" aria-label="主导航">
-        <a href="/">Workbench</a>
-        <a href="/interview-review" aria-current="page">Review</a>
-        <a href="/login">Demo Shop</a>
-        <a href="/diagnosis-report">AI Report</a>
+        <a href="/">工作台</a>
+        <a href="/interview-review" aria-current="page">审阅模式</a>
+        <a href="/login">示例系统</a>
+        <a href="/diagnosis-report">AI 报告</a>
       </nav>
     </header>
 
@@ -23,7 +23,7 @@
           <h1 id="review-title">面试官审阅模式</h1>
           <p>
             这一页按自动化测试面试官的视角组织：先看测试设计，再看测试证据链，
-            最后看 AI 如何把失败整理成可 review 的中文诊断材料。
+            最后看 AI 如何把失败整理成适合团队审阅的中文诊断材料。
           </p>
           <div class="hero-actions">
             <a class="button-link" href="/login">体验被测系统</a>
@@ -66,7 +66,7 @@
       <section class="dashboard-section" aria-labelledby="evidence-chain-title">
         <div class="section-heading">
           <h2 id="evidence-chain-title">测试证据链</h2>
-          <p>API / Service / E2E / CI 不是堆名词，而是从断言失败到团队 review 摘要的一条链路。</p>
+          <p>API / Service / E2E / CI 不是堆名词，而是从断言失败到团队审阅摘要的一条链路。</p>
         </div>
         <ol class="pipeline-steps review-chain">
           {% for step in pipeline_steps %}
@@ -103,7 +103,7 @@
 
       <section class="dashboard-section" aria-labelledby="failure-review-title">
         <div class="section-heading">
-          <h2 id="failure-review-title">Failure Mode Matrix 怎么读</h2>
+          <h2 id="failure-review-title">失败模式矩阵怎么读</h2>
           <p>重点不是让 AI 下结论，而是把失败证据整理成分类、候选根因 / 诊断假设和下一步行动。</p>
         </div>
         <div class="evidence-grid">
@@ -139,8 +139,8 @@
         <div class="panel review-boundary-card">
           <h2>安全边界</h2>
           <p>
-            页面只展示脱敏状态和安全摘要，不展示密钥、内部地址、模型名或 key source。
-            AI 报告用于辅助 review，不能替代 pytest、Playwright 和 CI 的质量门禁。
+            页面只展示脱敏状态和安全摘要，不展示密钥、内部地址、模型名或密钥来源。
+            AI 报告用于辅助审阅，不能替代 pytest、Playwright 和 CI 的质量门禁。
           </p>
           <p>
             真实公司日志公开前必须人工检查；本项目页面只展示适合面试的安全演示材料。
