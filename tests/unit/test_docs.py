@@ -16,6 +16,7 @@ SAMPLE_PR_COMMENT = Path("reports/examples/sample-pr-comment.md")
 CI_WORKFLOW = Path(".github/workflows/ci.yml")
 DEMO_WORKFLOW = Path(".github/workflows/demo-artifacts.yml")
 CI_ARTIFACTS_DOC = Path("docs/ci-artifacts.md")
+PYPROJECT = Path("pyproject.toml")
 VISUAL_ASSETS = (
     Path("docs/assets/provider-status.png"),
     Path("docs/assets/failure-mode-matrix.png"),
@@ -299,6 +300,15 @@ def test_ci_generates_pr_comment_preview_artifact():
         "Generate PR comment preview"
     )
     assert workflow.index("Generate PR comment preview") < workflow.index("Upload reports")
+
+
+def test_ci_feeds_junit_xml_into_ai_diagnosis():
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+    pyproject = PYPROJECT.read_text(encoding="utf-8")
+
+    assert "--junitxml=reports/latest/junit.xml" in pyproject
+    assert "--junit-xml reports/latest/junit.xml" in workflow
+    assert "reports/latest/junit.xml" in workflow
 
 
 def test_ci_pr_comment_preview_stays_dry_run():

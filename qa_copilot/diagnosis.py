@@ -29,11 +29,17 @@ def _fallback_context_from_prompt(prompt: str | None) -> dict[str, str]:
         elif stripped.startswith("Test: "):
             test = stripped.removeprefix("Test: ").strip()
         elif stripped == "Trace:":
+            trace_lines: list[str] = []
             for trace_line in lines[index + 1 :]:
                 trace = trace_line.strip()
-                if trace:
-                    evidence = trace[:180]
+                if not trace and trace_lines:
                     break
+                if trace:
+                    trace_lines.append(trace)
+                if len(trace_lines) >= 3:
+                    break
+            if trace_lines:
+                evidence = " / ".join(trace_lines)[:240]
             break
 
     mode_rules = {

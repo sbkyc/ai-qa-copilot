@@ -6,14 +6,21 @@ from pathlib import Path
 
 from qa_copilot.artifacts import load_failure_artifacts
 from qa_copilot.diagnosis import diagnose_with_ai
+from qa_copilot.junit_parser import load_junit_failures
 from qa_copilot.prompt_builder import build_diagnosis_prompt
 from qa_copilot.provider_health import check_provider_health
 from qa_copilot.providers import supported_provider_specs
 from qa_copilot.report_writer import write_markdown_report
 
 
-def generate_report(input_path: str | Path, output_path: str | Path) -> None:
+def generate_report(
+    input_path: str | Path,
+    output_path: str | Path,
+    junit_xml_path: str | Path | None = None,
+) -> None:
     artifacts = load_failure_artifacts(input_path)
+    if junit_xml_path is not None:
+        artifacts.extend(load_junit_failures(junit_xml_path))
     if not artifacts:
         write_markdown_report(
             Path(output_path),
@@ -38,6 +45,7 @@ def main() -> None:
         help="Exit with code 1 when --check-provider reports an unhealthy config.",
     )
     parser.add_argument("--input", default="reports/latest/failures")
+    parser.add_argument("--junit-xml", default=None)
     parser.add_argument("--output", default="reports/latest/ai-diagnosis.md")
     args = parser.parse_args()
 
@@ -54,7 +62,7 @@ def main() -> None:
             raise SystemExit(1)
         return
 
-    generate_report(args.input, args.output)
+    generate_report(args.input, args.output, junit_xml_path=args.junit_xml)
 
 
 if __name__ == "__main__":

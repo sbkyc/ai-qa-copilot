@@ -43,6 +43,33 @@ def test_generate_report_writes_diagnosis_for_failure_artifact(tmp_path, monkeyp
     assert "未配置 AI 服务密钥" in report
 
 
+def test_generate_report_accepts_junit_xml_input(tmp_path, monkeypatch):
+    clear_provider_env(monkeypatch)
+    junit_xml = tmp_path / "junit.xml"
+    junit_xml.write_text(
+        (
+            '<testsuite timestamp="2026-07-06T12:00:00">\n'
+            '  <testcase classname="tests.e2e.test_checkout_flow" '
+            'name="test_pay_button" time="1.5">\n'
+            '    <failure message="button hidden">'
+            "AssertionError: expect(locator).to_be_visible() failed"
+            "</failure>\n"
+            "  </testcase>\n"
+            "</testsuite>\n"
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "diagnosis.md"
+
+    generate_report(tmp_path / "missing-json-dir", output, junit_xml_path=junit_xml)
+
+    report = output.read_text(encoding="utf-8")
+    assert "未配置 AI 服务密钥" in report
+    assert "UI/E2E behavior" in report
+    assert "tests/e2e/test_checkout_flow.py::test_pay_button" in report
+    assert "expect(locator).to_be_visible() failed" in report
+
+
 def test_cli_lists_supported_providers(monkeypatch, capsys):
     monkeypatch.setattr("sys.argv", ["qa-copilot", "--list-providers"])
 

@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate AI diagnosis
         if: always()
-        run: python -m qa_copilot.cli --input reports/latest/failures --output reports/latest/ai-diagnosis.md
+        run: python -m qa_copilot.cli --input reports/latest/failures --junit-xml reports/latest/junit.xml --output reports/latest/ai-diagnosis.md
 
       - name: Generate PR comment preview
         if: always()
