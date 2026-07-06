@@ -22,7 +22,7 @@ def test_dashboard_page_renders_diagnosis_workspace(client):
     assert 'name="longrepr"' in response.text
     assert "粘贴 pytest / Playwright / API 失败日志" in response.text
     assert "生成中文诊断报告" in response.text
-    assert "示例失败日志" in response.text
+    assert "选择示例场景" in response.text
     assert "面试官审阅模式" in response.text
 
 
@@ -56,6 +56,35 @@ def test_dashboard_uses_chinese_first_ui_labels(client):
         "Environment/setup",
     ):
         assert phrase not in response.text
+
+
+def test_dashboard_prefills_selected_failure_example(client):
+    response = client.get("/?example=flaky_timing")
+
+    assert response.status_code == 200
+    assert "tests/e2e/test_product_search.py::test_search_filters_results" in response.text
+    assert "Flaky test summary: passed 7 times and failed 3 times" in response.text
+    assert 'value="flaky, e2e, timing"' in response.text
+    assert '<option value="call" selected>执行阶段</option>' in response.text
+    assert 'href="/?example=flaky_timing" aria-current="true"' in response.text
+
+
+def test_dashboard_lists_clickable_failure_examples(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    for phrase in (
+        "选择示例场景",
+        "接口契约问题",
+        "UI 可见性问题",
+        "偶发/时序问题",
+        "环境/初始化问题",
+        'href="/?example=api_contract"',
+        'href="/?example=ui_e2e"',
+        'href="/?example=flaky_timing"',
+        'href="/?example=environment_setup"',
+    ):
+        assert phrase in response.text
 
 
 def test_public_pages_do_not_render_mojibake(client):

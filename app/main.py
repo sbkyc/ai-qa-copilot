@@ -193,6 +193,68 @@ FAILURE_MODE_ROWS = [
     },
 ]
 
+DASHBOARD_FAILURE_EXAMPLES = [
+    {
+        "id": "api_contract",
+        "label": "接口契约问题",
+        "summary": "请求体缺字段，接口返回 422。",
+        "nodeid": "tests/api/test_orders.py::test_create_order_contract",
+        "phase": "call",
+        "phase_label": "执行阶段",
+        "keywords": "api, contract",
+        "longrepr": (
+            "AssertionError: expected status code 201 but got 422\n"
+            "POST /api/orders\n"
+            'response body: {"detail": [{"loc": ["body", "quantity"], '
+            '"msg": "Field required"}]}'
+        ),
+    },
+    {
+        "id": "ui_e2e",
+        "label": "UI 可见性问题",
+        "summary": "Playwright 断言按钮应可见，但页面仍隐藏。",
+        "nodeid": "tests/e2e/test_checkout_flow.py::test_checkout_button_enables_payment",
+        "phase": "call",
+        "phase_label": "执行阶段",
+        "keywords": "playwright, e2e, visibility",
+        "longrepr": (
+            "AssertionError: expect(locator).to_be_visible() failed\n"
+            "Locator: get_by_role('button', name='Pay now')\n"
+            "Expected: visible\n"
+            "Received: hidden\n"
+            "Page URL: /checkout"
+        ),
+    },
+    {
+        "id": "flaky_timing",
+        "label": "偶发/时序问题",
+        "summary": "同一用例多次运行偶发失败，疑似等待条件不稳。",
+        "nodeid": "tests/e2e/test_product_search.py::test_search_filters_results",
+        "phase": "call",
+        "phase_label": "执行阶段",
+        "keywords": "flaky, e2e, timing",
+        "longrepr": (
+            "Flaky test summary: passed 7 times and failed 3 times\n"
+            "TimeoutError: expected 3 product cards, observed 0 or 2\n"
+            "The assertion appears to race debounce and fetch state."
+        ),
+    },
+    {
+        "id": "environment_setup",
+        "label": "环境/初始化问题",
+        "summary": "fixture 在数据库表创建前运行，setup 阶段失败。",
+        "nodeid": "tests/conftest.py::db_seed_fixture",
+        "phase": "setup",
+        "phase_label": "准备阶段",
+        "keywords": "fixture, setup, database",
+        "longrepr": (
+            "sqlite3.OperationalError: no such table: products\n"
+            "Failed while running db_seed_fixture during setup.\n"
+            "Seed data touched products before database initialization completed."
+        ),
+    },
+]
+
 ARTIFACT_CARDS = [
     {
         "title": "CI 报告包",
@@ -678,6 +740,27 @@ def _display_phase(phase: str) -> str:
     }.get(phase.lower(), phase)
 
 
+def _dashboard_examples_view_model(
+    selected_example_id: str | None,
+) -> tuple[list[dict[str, object]], dict[str, str]]:
+    selected = next(
+        (
+            example
+            for example in DASHBOARD_FAILURE_EXAMPLES
+            if example["id"] == selected_example_id
+        ),
+        DASHBOARD_FAILURE_EXAMPLES[0],
+    )
+    examples = [
+        {
+            **example,
+            "is_selected": example["id"] == selected["id"],
+        }
+        for example in DASHBOARD_FAILURE_EXAMPLES
+    ]
+    return examples, selected
+
+
 def _parse_keywords(raw_keywords: str) -> list[str]:
     normalized = raw_keywords.replace("，", ",").replace("\n", ",")
     return [
@@ -703,10 +786,16 @@ def _failure_evidence_cards(artifacts: list[FailureArtifact]) -> list[dict[str, 
     return cards
 
 
-def _dashboard_context(db: sqlite3.Connection) -> dict[str, object]:
+def _dashboard_context(
+    db: sqlite3.Connection,
+    selected_example_id: str | None = None,
+) -> dict[str, object]:
     sample_artifacts = load_failure_artifacts("reports/examples")
     provider_specs = supported_provider_specs()
     provider_health = _provider_health_view_model()
+    dashboard_examples, selected_example = _dashboard_examples_view_model(
+        selected_example_id
+    )
     return {
         "provider_health": provider_health,
         "ai_mode": _dashboard_ai_mode_view_model(provider_health),
@@ -721,6 +810,8 @@ def _dashboard_context(db: sqlite3.Connection) -> dict[str, object]:
         "failure_mode_rows": FAILURE_MODE_ROWS,
         "failure_evidence_cards": _failure_evidence_cards(sample_artifacts),
         "artifact_cards": ARTIFACT_CARDS,
+        "dashboard_examples": dashboard_examples,
+        "selected_example": selected_example,
         "latest_report": _latest_report_view_model(),
         "report_history": _report_history_view_model(),
     }
@@ -847,11 +938,15 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         return ProviderHealthResponse(**check_provider_health())
 
     @api.get("/", response_class=HTMLResponse)
-    def dashboard_page(request: Request, db: DbConnection) -> HTMLResponse:
+    def dashboard_page(
+        request: Request,
+        db: DbConnection,
+        example: str | None = None,
+    ) -> HTMLResponse:
         return templates.TemplateResponse(
             request,
             "dashboard.html",
-            _dashboard_context(db),
+            _dashboard_context(db, example),
         )
 
     @api.post("/diagnose", response_model=None)

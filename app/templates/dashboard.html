@@ -65,27 +65,25 @@
           <form class="diagnosis-form" method="post" action="/diagnose">
             <label for="nodeid">
               测试名称
-              <input id="nodeid" name="nodeid" value="tests/api/test_orders.py::test_create_order_contract">
+              <input id="nodeid" name="nodeid" value="{{ selected_example.nodeid }}">
             </label>
             <div class="form-row">
               <label for="phase">
                 失败阶段
                 <select id="phase" name="phase">
-                  <option value="call">执行阶段</option>
-                  <option value="setup">准备阶段</option>
-                  <option value="teardown">清理阶段</option>
+                  <option value="call"{% if selected_example.phase == "call" %} selected{% endif %}>执行阶段</option>
+                  <option value="setup"{% if selected_example.phase == "setup" %} selected{% endif %}>准备阶段</option>
+                  <option value="teardown"{% if selected_example.phase == "teardown" %} selected{% endif %}>清理阶段</option>
                 </select>
               </label>
               <label for="keywords">
                 关键词
-                <input id="keywords" name="keywords" value="api, contract">
+                <input id="keywords" name="keywords" value="{{ selected_example.keywords }}">
               </label>
             </div>
             <label for="longrepr">
               失败日志
-              <textarea id="longrepr" name="longrepr" rows="12">AssertionError: expected status code 201 but got 422
-POST /api/orders
-response body: {"detail": [{"loc": ["body", "quantity"], "msg": "Field required"}]}</textarea>
+              <textarea id="longrepr" name="longrepr" rows="12">{{ selected_example.longrepr }}</textarea>
             </label>
             <div class="form-actions">
               <button type="submit">生成中文诊断报告</button>
@@ -95,28 +93,21 @@ response body: {"detail": [{"loc": ["body", "quantity"], "msg": "Field required"
         </section>
 
         <aside class="panel sample-log-panel" aria-labelledby="sample-log-title">
-          <h2 id="sample-log-title">示例失败日志</h2>
+          <h2 id="sample-log-title">选择示例场景</h2>
           <p>
-            可以直接用左侧默认内容生成报告，也可以替换成自己的 pytest、Playwright 或接口测试失败输出。
+            点一个场景会自动填充左侧表单；也可以继续替换成自己的 pytest、Playwright 或接口测试失败输出。
           </p>
-          <dl class="sample-log-list">
-            <div>
-              <dt>接口契约</dt>
-              <dd>请求体缺字段，返回 422。</dd>
-            </div>
-            <div>
-              <dt>UI / E2E</dt>
-              <dd>按钮不可见、页面状态未满足。</dd>
-            </div>
-            <div>
-              <dt>偶发/时序</dt>
-              <dd>同一用例多次运行偶发失败。</dd>
-            </div>
-            <div>
-              <dt>环境/初始化</dt>
-              <dd>fixture、数据库或环境初始化失败。</dd>
-            </div>
-          </dl>
+          <div class="sample-log-list">
+            {% for example in dashboard_examples %}
+              <a
+                class="sample-example-card{% if example.is_selected %} sample-example-card-active{% endif %}"
+                href="/?example={{ example.id }}"{% if example.is_selected %} aria-current="true"{% endif %}
+              >
+                <strong>{{ example.label }}</strong>
+                <span>{{ example.summary }}</span>
+              </a>
+            {% endfor %}
+          </div>
           <div class="support-links">
             <a class="button-link button-link-secondary" href="/login">示例被测系统</a>
             <a class="button-link button-link-secondary" href="/interview-review">面试官审阅模式</a>
