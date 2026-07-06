@@ -46,7 +46,7 @@ def test_readme_links_portfolio_walkthrough():
 
     assert "[Portfolio Walkthrough](docs/portfolio-walkthrough.md)" in readme
     assert "3-minute interview path" in readme
-    assert "Chinese Showcase Dashboard" in readme
+    assert "AI QA workbench" in readme
     assert "/interview-review" in readme
     assert "http://127.0.0.1:8000/login" in readme
 
@@ -216,9 +216,9 @@ def test_chinese_demo_script_explains_order_flow_and_next_steps():
     for phrase in (
         "面试官审阅模式",
         "/interview-review",
-        "买商品只是被测业务场景",
+        "买商品只是可选的被测业务场景",
         "下单成功不是终点",
-        "Dashboard -> Demo Shop order -> QA reports",
+        "Workbench failure input -> Chinese AI diagnosis report",
         "failure JSON",
         "AI diagnosis",
         "pr-comment.md",
@@ -236,7 +236,7 @@ def test_application_package_is_copy_ready_for_job_search():
     for phrase in (
         "简历项目经历 4 条 bullet",
         "3 分钟演示讲稿",
-        "Dashboard -> Demo Shop 下单 -> failure artifacts",
+        "AI QA 诊断工作台",
         "候选根因 / 诊断假设",
         "不调用 GitHub PR/Issues API",
         "不会自动评论 PR",
@@ -253,9 +253,9 @@ def test_application_package_is_copy_ready_for_job_search():
 def test_portfolio_walkthrough_explains_order_flow_purpose():
     walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
 
-    assert "Dashboard -> Demo Shop order -> QA reports" in walkthrough
+    assert "Workbench failure input" in walkthrough
     assert "What Happens After Buying A Product" in walkthrough
-    assert "Buying a product is not the product goal." in walkthrough
+    assert "The workbench is the product surface." in walkthrough
     assert "system under test" in walkthrough
 
 

@@ -2,6 +2,7 @@ import os
 import sqlite3
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from html import escape
 from pathlib import Path
 from typing import Annotated
@@ -36,6 +37,7 @@ from qa_copilot.diagnosis import diagnose_with_ai
 from qa_copilot.prompt_builder import build_diagnosis_prompt
 from qa_copilot.provider_health import check_provider_health
 from qa_copilot.providers import supported_provider_specs
+from qa_copilot.report_writer import write_markdown_report
 
 templates = Jinja2Templates(directory="app/templates")
 
@@ -142,7 +144,7 @@ INTERVIEW_SCORECARDS = [
 ]
 
 INTERVIEW_REVIEW_STEPS = [
-    "先看 Dashboard，确认项目不是电商 Demo，而是自动化测试证据中心。",
+    "先看 AI QA 诊断工作台，确认项目不是电商 Demo，而是可直接使用的失败诊断工具。",
     "再看测试覆盖，说明 API / Service / E2E / CI 各自验证什么。",
     "进入 Demo Shop 下单，证明被测系统有真实登录、商品、库存和订单路径。",
     "最后看中文 AI 报告，讲 Failure Mode Matrix、证据、候选根因和下一步建议。",
@@ -206,6 +208,7 @@ ARTIFACT_CARDS = [
 ]
 
 REPORT_FALLBACK_PATH = Path("reports/examples/sample-ai-diagnosis.md")
+WEB_REPORT_PATH = Path("reports/latest/web-ai-diagnosis.md")
 
 
 def _plain_markdown(text: str) -> str:
@@ -230,6 +233,7 @@ def _find_latest_report_path() -> Path | None:
 
     latest_dir = Path("reports/latest")
     preferred_reports = [
+        latest_dir / "web-ai-diagnosis.md",
         latest_dir / "deepseek-ai-diagnosis-zh.md",
         latest_dir / "deepseek-ai-diagnosis.md",
         latest_dir / "ai-diagnosis-zh.md",
@@ -249,6 +253,13 @@ def _find_latest_report_path() -> Path | None:
     if REPORT_FALLBACK_PATH.is_file():
         return REPORT_FALLBACK_PATH
     return None
+
+
+def _web_report_path() -> Path:
+    override = os.getenv("AI_QA_REPORT_PATH")
+    if override:
+        return Path(override)
+    return WEB_REPORT_PATH
 
 
 def _extract_report_summary(markdown: str) -> str:
@@ -314,6 +325,7 @@ def _render_markdown_document(markdown: str) -> str:
     html_parts: list[str] = []
     lines = markdown.splitlines()
     index = 0
+    skipped_document_title = False
     while index < len(lines):
         line = lines[index].rstrip()
         stripped = line.strip()
@@ -358,6 +370,10 @@ def _render_markdown_document(markdown: str) -> str:
         if stripped.startswith("#"):
             level = min(len(stripped) - len(stripped.lstrip("#")), 3)
             text = stripped[level:].strip()
+            if level == 1 and not skipped_document_title:
+                skipped_document_title = True
+                index += 1
+                continue
             html_parts.append(f"<h{level}>{_render_inline_markdown(text)}</h{level}>")
             index += 1
             continue
@@ -476,7 +492,7 @@ def _dashboard_ai_mode_view_model(
             "ok": False,
             "status_label": "AI 配置需检查",
             "mode_label": "本地报告可用",
-            "body": "现场生成前需要检查 AI 配置；Dashboard 仍可展示安全样例和已生成报告。",
+            "body": "现场生成前需要检查 AI 配置；工作台仍可展示安全样例和已生成报告。",
         }
 
     return {
@@ -513,6 +529,15 @@ def _short_failure_evidence(longrepr: str) -> str:
 
 def _display_test_name(nodeid: str) -> str:
     return nodeid.rsplit("::", 1)[-1].replace("_", " ")
+
+
+def _parse_keywords(raw_keywords: str) -> list[str]:
+    normalized = raw_keywords.replace("，", ",").replace("\n", ",")
+    return [
+        keyword.strip()
+        for keyword in normalized.split(",")
+        if keyword.strip()
+    ]
 
 
 def _failure_evidence_cards(artifacts: list[FailureArtifact]) -> list[dict[str, str]]:
@@ -680,6 +705,29 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
             "dashboard.html",
             _dashboard_context(db),
         )
+
+    @api.post("/diagnose", response_model=None)
+    async def web_diagnosis(request: Request) -> RedirectResponse:
+        form = await request.form()
+        nodeid = str(form.get("nodeid", "")).strip() or "manual/input::failure"
+        phase = str(form.get("phase", "")).strip() or "call"
+        longrepr = str(form.get("longrepr", "")).strip()
+        keywords = _parse_keywords(str(form.get("keywords", "")))
+        if not longrepr:
+            longrepr = "No failure log was provided."
+
+        artifact = FailureArtifact(
+            nodeid=nodeid,
+            failed_at=datetime.now(UTC).isoformat(),
+            phase=phase,
+            duration_seconds=0,
+            longrepr=longrepr,
+            keywords=keywords,
+        )
+        prompt = build_diagnosis_prompt([artifact])
+        report = diagnose_with_ai(prompt)
+        write_markdown_report(_web_report_path(), "中文 AI 诊断报告", report)
+        return RedirectResponse("/diagnosis-report", status_code=303)
 
     @api.get("/diagnosis-report", response_class=HTMLResponse)
     def diagnosis_report_page(request: Request) -> HTMLResponse:

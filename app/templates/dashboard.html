@@ -3,155 +3,131 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>自动化测试证据中心</title>
+    <title>AI QA 诊断工作台</title>
     <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
     <header class="topbar">
       <a class="brand" href="/">AI QA Copilot</a>
       <nav class="topbar-nav" aria-label="主导航">
-        <a href="/" aria-current="page">Dashboard</a>
-        <a href="/interview-review">Review</a>
-        <a href="/login">Demo Shop</a>
+        <a href="/" aria-current="page">Workbench</a>
         <a href="/diagnosis-report">AI Report</a>
+        <a href="/login">Demo Shop</a>
+        <a href="/interview-review">Review</a>
       </nav>
     </header>
 
-    <main class="dashboard-shell">
-      <section class="dashboard-hero" aria-labelledby="dashboard-title">
-        <div class="dashboard-hero-copy">
-          <h1 id="dashboard-title">自动化测试证据中心</h1>
+    <main class="dashboard-shell workbench-shell">
+      <section class="workbench-hero" aria-labelledby="workbench-title">
+        <div class="workbench-copy">
+          <h1 id="workbench-title">AI QA 诊断工作台</h1>
           <p>
-            Demo Shop 只是被测对象。这个项目真正展示的是：如何设计 API、Service、
-            Playwright E2E 测试，如何保存失败证据，并用中文 AI 诊断报告辅助定位问题。
+            粘贴 pytest / Playwright / API 失败日志，生成中文诊断报告。
+            输出会包含 Failure Mode Matrix、证据、候选根因 / 诊断假设和下一步建议。
           </p>
-          <div class="hero-actions">
-            <a class="button-link" href="#coverage-title">查看测试覆盖</a>
-            <a class="button-link button-link-secondary" href="/interview-review">面试官审阅模式</a>
-            <a class="button-link button-link-secondary" href="/login">体验被测系统</a>
-            <a class="button-link button-link-secondary" href="/diagnosis-report">查看中文 AI 报告</a>
-          </div>
         </div>
-        <aside class="hero-summary" aria-label="项目测试概览">
-          <div>
-            <span>测试层级</span>
-            <strong>{{ coverage_count }}</strong>
+        <aside class="panel provider-status provider-status-{{ 'ok' if ai_mode.ok else 'warning' }}" aria-labelledby="dashboard-ai-mode-title">
+          <div class="provider-status-header">
+            <div>
+              <h2 id="dashboard-ai-mode-title">AI 诊断模式</h2>
+              <p class="provider-status-summary">{{ ai_mode.status_label }}</p>
+            </div>
+            <a class="button-link button-link-secondary" href="/">刷新</a>
           </div>
-          <div>
-            <span>失败样例</span>
-            <strong>{{ sample_artifact_count }}</strong>
-          </div>
-          <div>
-            <span>AI 报告</span>
-            <strong>中文</strong>
-          </div>
+          <dl class="provider-status-meta">
+            <div>
+              <dt>生成方式</dt>
+              <dd>{{ ai_mode.mode_label }}</dd>
+            </div>
+            <div>
+              <dt>报告语言</dt>
+              <dd>中文</dd>
+            </div>
+            <div>
+              <dt>安全展示</dt>
+              <dd>隐藏内部配置</dd>
+            </div>
+          </dl>
+          <p class="boundary-note">
+            页面不展示密钥或内部配置。AI 不替代 pytest / Playwright / CI，只负责辅助整理失败证据。
+          </p>
         </aside>
       </section>
 
-      <section class="dashboard-section demo-path-panel" aria-labelledby="demo-path-title">
-        <div class="section-heading">
-          <h2 id="demo-path-title">面试官阅读顺序</h2>
-          <p>先证明测试设计，再演示被测系统，最后展示失败定位和 AI 辅助诊断。</p>
-        </div>
-        <ol class="demo-path-steps">
-          <li>
-            <strong>1. 看测试覆盖</strong>
-            <span>说明 API、Service、E2E 和 CI 分别解决什么质量风险。</span>
-          </li>
-          <li>
-            <strong>2. 体验 Demo Shop</strong>
-            <span>登录和下单只是被测业务路径，用来证明浏览器自动化能覆盖真实流程。</span>
-          </li>
-          <li>
-            <strong>3. 看失败诊断</strong>
-            <span>失败样例会进入证据链，再生成中文 Failure Mode Matrix 和修复建议。</span>
-          </li>
-        </ol>
-      </section>
+      <section class="workbench-grid" aria-label="诊断输入和结果预览">
+        <section class="panel diagnosis-input-panel" aria-labelledby="diagnosis-form-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="diagnosis-form-title">生成诊断</h2>
+              <p>面试官可以直接粘贴失败日志试用；没有实时 AI 配置时会生成 fallback 报告。公开演示请避免粘贴公司内部敏感日志。</p>
+            </div>
+          </div>
+          <form class="diagnosis-form" method="post" action="/diagnose">
+            <label for="nodeid">
+              测试名称
+              <input id="nodeid" name="nodeid" value="tests/api/test_orders.py::test_create_order_contract">
+            </label>
+            <div class="form-row">
+              <label for="phase">
+                失败阶段
+                <select id="phase" name="phase">
+                  <option value="call">call</option>
+                  <option value="setup">setup</option>
+                  <option value="teardown">teardown</option>
+                </select>
+              </label>
+              <label for="keywords">
+                关键词
+                <input id="keywords" name="keywords" value="api, contract">
+              </label>
+            </div>
+            <label for="longrepr">
+              失败日志
+              <textarea id="longrepr" name="longrepr" rows="12">AssertionError: expected status code 201 but got 422
+POST /api/orders
+response body: {"detail": [{"loc": ["body", "quantity"], "msg": "Field required"}]}</textarea>
+            </label>
+            <div class="form-actions">
+              <button type="submit">生成中文诊断报告</button>
+              <a class="button-link button-link-secondary" href="/diagnosis-report">查看最近报告</a>
+            </div>
+          </form>
+        </section>
 
-      <section class="dashboard-section" aria-labelledby="coverage-title">
-        <div class="section-heading">
-          <h2 id="coverage-title">测试覆盖设计</h2>
-          <p>面试官最关心的不是页面多漂亮，而是你为什么这样分层测试、断言什么、能发现什么问题。</p>
-        </div>
-        <div class="coverage-grid">
-          {% for card in coverage_cards %}
-            <article class="coverage-card">
-              <div>
-                <strong>{{ card.badge }}</strong>
-                <h3>{{ card.title }}</h3>
-                <p>{{ card.body }}</p>
-              </div>
-              <ul class="check-list">
-                {% for check in card.checks %}
-                  <li>{{ check }}</li>
-                {% endfor %}
-              </ul>
-            </article>
-          {% endfor %}
-        </div>
-      </section>
-
-      <section class="dashboard-section" aria-labelledby="review-title">
-        <div class="section-heading">
-          <h2 id="review-title">面试官会追问什么</h2>
-          <p>这一组内容帮面试官快速看到你的测试思路，而不是只看到一个电商 Demo。</p>
-        </div>
-        <div class="review-grid">
-          {% for card in review_cards %}
-            <article class="review-card">
-              <h3>{{ card.title }}</h3>
-              <p>{{ card.body }}</p>
-            </article>
-          {% endfor %}
-        </div>
-      </section>
-
-      <section class="dashboard-section pipeline-panel" aria-labelledby="pipeline-title">
-        <div class="section-heading">
-          <h2 id="pipeline-title">自动化失败定位链路</h2>
-          <p>从业务路径到断言失败，再到证据、诊断和 review 摘要，形成一条完整 QA 工程闭环。</p>
-        </div>
-        <ol class="pipeline-steps">
-          {% for step in pipeline_steps %}
-            <li>
-              <span>{{ loop.index }}</span>
-              <strong>{{ step }}</strong>
-            </li>
-          {% endfor %}
-        </ol>
-      </section>
-
-      <section class="dashboard-section" aria-labelledby="evidence-title">
-        <div class="section-heading">
-          <h2 id="evidence-title">失败证据样例</h2>
-          <p>这些不是当前真实故障，而是安全演示样例，用来展示我如何区分产品缺陷、测试脚本问题、偶发问题和环境问题，并形成候选根因 / 诊断假设。</p>
-        </div>
-        <div class="evidence-grid">
-          {% for card in failure_evidence_cards %}
-            <article class="evidence-card">
-              <strong>{{ card.mode }}</strong>
-              <h3>{{ card.test_name }}</h3>
-              <dl>
-                <div>
-                  <dt>阶段</dt>
-                  <dd>{{ card.phase }}</dd>
-                </div>
-                <div>
-                  <dt>关键证据</dt>
-                  <dd>{{ card.evidence }}</dd>
-                </div>
-              </dl>
-              <p>{{ card.qa_value }}</p>
-            </article>
-          {% endfor %}
-        </div>
+        <aside class="panel sample-log-panel" aria-labelledby="sample-log-title">
+          <h2 id="sample-log-title">示例失败日志</h2>
+          <p>
+            可以直接用左侧默认内容生成报告，也可以替换成自己的 pytest、Playwright 或接口测试失败输出。
+          </p>
+          <dl class="sample-log-list">
+            <div>
+              <dt>API contract</dt>
+              <dd>请求体缺字段，返回 422。</dd>
+            </div>
+            <div>
+              <dt>UI / E2E</dt>
+              <dd>按钮不可见、页面状态未满足。</dd>
+            </div>
+            <div>
+              <dt>Flaky / timing</dt>
+              <dd>同一用例多次运行偶发失败。</dd>
+            </div>
+            <div>
+              <dt>Environment/setup</dt>
+              <dd>fixture、数据库或环境初始化失败。</dd>
+            </div>
+          </dl>
+          <div class="support-links">
+            <a class="button-link button-link-secondary" href="/login">示例被测系统</a>
+            <a class="button-link button-link-secondary" href="/interview-review">面试官审阅模式</a>
+          </div>
+        </aside>
       </section>
 
       <section class="dashboard-section report-preview-panel" aria-labelledby="latest-report-title">
         <div class="section-heading">
           <h2 id="latest-report-title">{{ latest_report.title }}</h2>
-          <p>这是 AI 根据失败证据生成的中文报告，重点看分类、证据和下一步建议。</p>
+          <p>生成后这里会更新最近一次报告；重点看分类、证据和下一步建议。</p>
         </div>
         <div class="report-preview-card">
           <div class="report-preview-summary">
@@ -184,84 +160,12 @@
               </table>
             </div>
           {% else %}
-            <p class="boundary-note">还没有可展示的矩阵内容。生成 AI 诊断报告后，这里会自动更新。</p>
+            <p class="boundary-note">还没有可展示的矩阵内容。提交失败日志后，这里会自动更新。</p>
           {% endif %}
           <div class="report-preview-actions">
-            <a class="button-link" href="/diagnosis-report">查看完整中文 AI 报告</a>
+            <a class="button-link" href="/diagnosis-report">查看完整中文 AI 诊断报告</a>
           </div>
         </div>
-      </section>
-
-      <section class="dashboard-two-column">
-        <section class="panel tested-system-card" aria-labelledby="tested-system-title">
-          <h2 id="tested-system-title">被测业务系统</h2>
-          <p>
-            Demo Shop 提供登录、商品、库存和订单路径，目的是让 API 测试和 Playwright E2E
-            有真实可执行的目标。
-          </p>
-          <dl class="provider-status-meta">
-            <div>
-              <dt>商品数量</dt>
-              <dd>{{ product_count }}</dd>
-            </div>
-            <div>
-              <dt>主流程</dt>
-              <dd>登录到下单</dd>
-            </div>
-            <div>
-              <dt>测试价值</dt>
-              <dd>端到端验证</dd>
-            </div>
-          </dl>
-          <a class="button-link" href="/login">进入 Demo Shop</a>
-        </section>
-
-        <section class="panel provider-status provider-status-{{ 'ok' if ai_mode.ok else 'warning' }}" aria-labelledby="dashboard-ai-mode-title">
-          <div class="provider-status-header">
-            <div>
-              <h2 id="dashboard-ai-mode-title">AI 诊断模式</h2>
-              <p class="provider-status-summary">{{ ai_mode.status_label }}</p>
-            </div>
-            <a class="button-link button-link-secondary" href="/">刷新</a>
-          </div>
-          <dl class="provider-status-meta">
-            <div>
-              <dt>生成方式</dt>
-              <dd>{{ ai_mode.mode_label }}</dd>
-            </div>
-            <div>
-              <dt>报告语言</dt>
-              <dd>中文</dd>
-            </div>
-            <div>
-              <dt>安全展示</dt>
-              <dd>隐藏内部配置</dd>
-            </div>
-          </dl>
-          <p>{{ ai_mode.body }}</p>
-          <p class="boundary-note">
-            Dashboard 只展示诊断模式，不展示密钥或内部配置，也不展示 provider 名称、模型名或内部地址。
-          </p>
-        </section>
-      </section>
-
-      <section class="dashboard-section" aria-labelledby="artifact-title">
-        <div class="section-heading">
-          <h2 id="artifact-title">报告产物</h2>
-          <p>CI 会保留测试报告、AI 诊断报告和 PR 摘要预览，方便说明完整证据链。</p>
-        </div>
-        <div class="artifact-grid">
-          {% for artifact in artifact_cards %}
-            <article class="artifact-card">
-              <h3>{{ artifact.title }}</h3>
-              <strong>{{ artifact.kind }}</strong>
-              <p>{{ artifact.body }}</p>
-            </article>
-          {% endfor %}
-        </div>
-        <p class="boundary-note">
-          真实企业日志公开前需要人工检查；面试页面只展示安全摘要。
-        </p>
       </section>
     </main>
   </body>

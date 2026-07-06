@@ -8,18 +8,24 @@ from playwright.sync_api import Page, expect
 def test_user_can_login_and_create_order(page: Page, live_server: str):
     page.goto(live_server)
 
-    expect(page.get_by_role("heading", name="自动化测试证据中心")).to_be_visible()
-    expect(page.get_by_role("heading", name="测试覆盖设计")).to_be_visible()
-    expect(page.get_by_role("heading", name="失败证据样例")).to_be_visible()
-    ai_mode = page.get_by_role("region", name="AI 诊断模式")
+    expect(page.get_by_role("heading", name="AI QA 诊断工作台")).to_be_visible()
+    ai_mode = page.get_by_role("complementary", name="AI 诊断模式")
     expect(ai_mode.get_by_role("heading", name="AI 诊断模式")).to_be_visible()
     expect(ai_mode.locator(".provider-status-summary")).to_have_text(
         "本地 fallback 模式"
     )
-    page.get_by_role("link", name="面试官审阅模式").click()
-    expect(page.get_by_role("heading", name="面试官审阅模式")).to_be_visible()
-    expect(page.get_by_role("heading", name="测试证据链")).to_be_visible()
-    page.get_by_role("link", name="体验被测系统").click()
+    page.get_by_label("测试名称").fill("tests/api/test_orders.py::test_contract")
+    page.get_by_role("textbox", name="失败日志").fill(
+        "AssertionError: expected 201 got 422"
+    )
+    page.get_by_label("关键词").fill("api, contract")
+    page.get_by_role("button", name="生成中文诊断报告").click()
+
+    expect(page.get_by_role("heading", name="中文 AI 诊断报告")).to_be_visible()
+    expect(page.get_by_text("Failure Mode Matrix", exact=False)).to_be_visible()
+
+    page.goto(live_server)
+    page.get_by_role("link", name="示例被测系统").click()
 
     expect(page.get_by_role("heading", name="AI QA 演示商店")).to_be_visible()
     page.get_by_label("用户名").fill("alice")
@@ -39,7 +45,7 @@ def test_user_can_login_and_create_order(page: Page, live_server: str):
     expect(page.get_by_text("alice 已购买 1 件 无线鼠标。")).to_be_visible()
     expect(page.get_by_role("heading", name="下单成功不是终点")).to_be_visible()
     expect(page.get_by_role("link", name="查看中文 AI 报告")).to_be_visible()
-    expect(page.get_by_role("link", name="返回 Dashboard")).to_be_visible()
+    expect(page.get_by_role("link", name="返回工作台")).to_be_visible()
 
 
 @pytest.mark.e2e
