@@ -13,7 +13,7 @@
 
 ## 30 秒项目介绍
 
-这是一个 AI 自动化测试与缺陷诊断平台。首页是可直接使用的 AI QA 诊断工作台：粘贴 pytest、Playwright 或 API 失败日志后，可以生成中文 AI diagnosis 和 Failure Mode Matrix。底层用 FastAPI Demo Shop、pytest、Playwright、failure JSON、CI artifacts 和 provider adapter 支撑完整工程闭环。
+这是一个 AI 自动化测试与缺陷诊断平台。首页是可直接使用的 AI QA 诊断工作台：粘贴 pytest、Playwright 或 API 失败日志后，可以生成中文 AI diagnosis 和 Failure Mode Matrix，并在“最近诊断”里保留多次报告。底层用 FastAPI Demo Shop、pytest、Playwright、failure JSON、CI artifacts 和 provider adapter 支撑完整工程闭环。
 
 ## 3 分钟演示讲稿
 

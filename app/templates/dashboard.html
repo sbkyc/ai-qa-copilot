@@ -167,6 +167,24 @@ response body: {"detail": [{"loc": ["body", "quantity"], "msg": "Field required"
           </div>
         </div>
       </section>
+
+      {% if report_history %}
+        <section class="dashboard-section report-history-panel" aria-labelledby="report-history-title">
+          <div class="section-heading">
+            <h2 id="report-history-title">最近诊断</h2>
+            <p>保留最近生成的报告，方便对比不同失败日志的诊断结果。</p>
+          </div>
+          <div class="report-history-list">
+            {% for report in report_history %}
+              <a class="report-history-item" href="{{ report.url }}">
+                <span>{{ report.generated_at }}</span>
+                <strong>{{ report.title }}</strong>
+                <p>{{ report.summary }}</p>
+              </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
     </main>
   </body>
 </html>

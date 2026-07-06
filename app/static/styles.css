@@ -851,6 +851,60 @@ body {
   box-shadow: none;
 }
 
+.report-history-panel {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.report-page-history {
+  margin-top: 22px;
+  box-shadow: none;
+}
+
+.report-history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.report-history-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: inherit;
+  text-decoration: none;
+}
+
+.report-history-item:hover,
+.report-history-item:focus-visible {
+  border-color: rgba(17, 124, 111, 0.38);
+  background: #f4fbf9;
+}
+
+.report-history-item span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.report-history-item strong {
+  color: var(--text);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.report-history-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .artifact-card strong {
   display: inline-flex;
   margin-top: 10px;

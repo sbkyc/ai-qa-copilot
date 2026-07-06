@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import parse_qs, urlparse
+
 from tests.helpers import clear_provider_env
 
 
@@ -104,6 +106,112 @@ def test_web_diagnosis_form_generates_report(client, tmp_path, monkeypatch):
     assert "表单输入已生成诊断" in report_path.read_text(encoding="utf-8")
     assert "tests/api/test_orders.py::test_contract" in captured["prompt"]
     assert "AssertionError: expected 201 got 422" in captured["prompt"]
+
+
+def test_web_diagnosis_form_creates_timestamped_history_report(client, tmp_path, monkeypatch):
+    captured: dict[str, str] = {}
+
+    def fake_diagnose(prompt: str) -> str:
+        captured["prompt"] = prompt
+        return """## 摘要
+
+历史报告已生成。
+
+## Failure Mode Matrix（失败模式矩阵）
+
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+| --- | --- | --- | --- | --- |
+| API contract | test_contract | expected 201 got 422 | 契约漂移 | 对齐 schema。 |
+"""
+
+    monkeypatch.delenv("AI_QA_REPORT_PATH", raising=False)
+    monkeypatch.setenv("AI_QA_REPORT_DIR", str(tmp_path))
+    monkeypatch.setattr("app.main.diagnose_with_ai", fake_diagnose)
+
+    response = client.post(
+        "/diagnose",
+        data={
+            "nodeid": "tests/api/test_orders.py::test_contract",
+            "phase": "call",
+            "keywords": "api, contract",
+            "longrepr": "AssertionError: expected 201 got 422",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    parsed = urlparse(response.headers["location"])
+    assert parsed.path == "/diagnosis-report"
+    report_name = parse_qs(parsed.query)["report"][0]
+    assert report_name.startswith("web-ai-diagnosis-")
+    assert report_name.endswith(".md")
+    assert (tmp_path / report_name).is_file()
+    assert "tests/api/test_orders.py::test_contract" in captured["prompt"]
+
+
+def test_dashboard_shows_recent_diagnosis_history(client, tmp_path, monkeypatch):
+    older = tmp_path / "web-ai-diagnosis-20260706-120000.md"
+    older.write_text(
+        "# 中文 AI 诊断报告\n\n## 摘要\n较早的接口契约诊断。\n",
+        encoding="utf-8",
+    )
+    newer = tmp_path / "web-ai-diagnosis-20260706-121500.md"
+    newer.write_text(
+        "# 中文 AI 诊断报告\n\n## 摘要\n最新的 Playwright 可见性诊断。\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("AI_QA_REPORT_PATH", raising=False)
+    monkeypatch.setenv("AI_QA_REPORT_DIR", str(tmp_path))
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "最近诊断" in response.text
+    assert "最新的 Playwright 可见性诊断" in response.text
+    assert "较早的接口契约诊断" in response.text
+    assert 'href="/diagnosis-report?report=web-ai-diagnosis-20260706-121500.md"' in response.text
+    assert 'href="/diagnosis-report?report=web-ai-diagnosis-20260706-120000.md"' in response.text
+
+
+def test_diagnosis_report_page_can_render_selected_history_report(
+    client, tmp_path, monkeypatch
+):
+    selected = tmp_path / "web-ai-diagnosis-20260706-121500.md"
+    selected.write_text(
+        """# 中文 AI 诊断报告
+
+## 摘要
+这是被选中的历史报告。
+
+### Failure Mode Matrix（失败模式矩阵）
+
+| 失败模式 | 影响测试 | 证据 | 可能分类 | 下一步 |
+|---|---|---|---|---|
+| UI/E2E behavior | test_checkout | button hidden | UI 状态问题 | 检查前置条件。 |
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("AI_QA_REPORT_PATH", raising=False)
+    monkeypatch.setenv("AI_QA_REPORT_DIR", str(tmp_path))
+
+    response = client.get(
+        "/diagnosis-report?report=web-ai-diagnosis-20260706-121500.md"
+    )
+
+    assert response.status_code == 200
+    assert "这是被选中的历史报告" in response.text
+    assert "UI/E2E behavior" in response.text
+
+
+def test_diagnosis_report_page_rejects_unsafe_history_report_name(
+    client, tmp_path, monkeypatch
+):
+    monkeypatch.delenv("AI_QA_REPORT_PATH", raising=False)
+    monkeypatch.setenv("AI_QA_REPORT_DIR", str(tmp_path))
+
+    response = client.get("/diagnosis-report?report=../secret.md")
+
+    assert response.status_code == 404
 
 
 def test_interview_review_page_explains_project_value(client):

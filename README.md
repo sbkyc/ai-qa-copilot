@@ -77,6 +77,8 @@ The landing page is a Chinese AI QA workbench. Paste a pytest, Playwright, or AP
 http://127.0.0.1:8000/diagnosis-report
 ```
 
+Each web-generated report is saved as a timestamped local Markdown file and appears in the **最近诊断** history list, so reviewers can compare multiple failure logs without overwriting the previous result.
+
 The Demo Shop is a supporting system under test, not the main product. Its login is available at:
 
 ```text

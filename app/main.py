@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from html import escape
 from pathlib import Path
 from typing import Annotated
+from urllib.parse import quote
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -208,7 +209,8 @@ ARTIFACT_CARDS = [
 ]
 
 REPORT_FALLBACK_PATH = Path("reports/examples/sample-ai-diagnosis.md")
-WEB_REPORT_PATH = Path("reports/latest/web-ai-diagnosis.md")
+REPORT_LATEST_DIR = Path("reports/latest")
+WEB_REPORT_PREFIX = "web-ai-diagnosis"
 
 
 def _plain_markdown(text: str) -> str:
@@ -225,13 +227,37 @@ def _split_markdown_table_row(line: str) -> list[str]:
     return [_plain_markdown(cell) for cell in line.strip().strip("|").split("|")]
 
 
+def _report_dir() -> Path:
+    override = os.getenv("AI_QA_REPORT_DIR")
+    if override:
+        return Path(override)
+    return REPORT_LATEST_DIR
+
+
+def _is_safe_report_name(report_name: str) -> bool:
+    path = Path(report_name)
+    return (
+        path.name == report_name
+        and path.suffix == ".md"
+        and "diagnosis" in path.name
+        and path.name != "pr-comment.md"
+    )
+
+
+def _selected_report_path(report_name: str) -> Path | None:
+    if not _is_safe_report_name(report_name):
+        return None
+    path = _report_dir() / report_name
+    return path if path.is_file() else None
+
+
 def _find_latest_report_path() -> Path | None:
     override = os.getenv("AI_QA_REPORT_PATH")
     if override:
         path = Path(override)
         return path if path.is_file() else None
 
-    latest_dir = Path("reports/latest")
+    latest_dir = _report_dir()
     preferred_reports = [
         latest_dir / "web-ai-diagnosis.md",
         latest_dir / "deepseek-ai-diagnosis-zh.md",
@@ -255,11 +281,12 @@ def _find_latest_report_path() -> Path | None:
     return None
 
 
-def _web_report_path() -> Path:
+def _web_report_path(generated_at: datetime | None = None) -> Path:
     override = os.getenv("AI_QA_REPORT_PATH")
     if override:
         return Path(override)
-    return WEB_REPORT_PATH
+    timestamp = (generated_at or datetime.now(UTC)).strftime("%Y%m%d-%H%M%S-%f")
+    return _report_dir() / f"{WEB_REPORT_PREFIX}-{timestamp}.md"
 
 
 def _extract_report_summary(markdown: str) -> str:
@@ -417,8 +444,8 @@ def _render_markdown_document(markdown: str) -> str:
     return "\n".join(html_parts)
 
 
-def _latest_report_view_model() -> dict[str, object]:
-    path = _find_latest_report_path()
+def _latest_report_view_model(path: Path | None = None) -> dict[str, object]:
+    path = path or _find_latest_report_path()
     if path is None:
         return {
             "available": False,
@@ -435,6 +462,40 @@ def _latest_report_view_model() -> dict[str, object]:
         "matrix_rows": _extract_report_matrix(markdown),
         "html": _render_markdown_document(markdown),
     }
+
+
+def _report_history_view_model(limit: int = 5) -> list[dict[str, str]]:
+    if os.getenv("AI_QA_REPORT_PATH"):
+        return []
+    report_dir = _report_dir()
+    if not report_dir.is_dir():
+        return []
+    candidates = [
+        path
+        for path in report_dir.glob("*diagnosis*.md")
+        if path.is_file() and _is_safe_report_name(path.name)
+    ]
+    recent = sorted(
+        candidates,
+        key=lambda path: (path.stat().st_mtime, path.name),
+        reverse=True,
+    )[:limit]
+    reports: list[dict[str, str]] = []
+    for path in recent:
+        markdown = path.read_text(encoding="utf-8")
+        generated_at = datetime.fromtimestamp(path.stat().st_mtime).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        reports.append(
+            {
+                "name": path.name,
+                "title": f"诊断报告 {generated_at}",
+                "url": f"/diagnosis-report?report={quote(path.name)}",
+                "generated_at": generated_at,
+                "summary": _extract_report_summary(markdown),
+            }
+        )
+    return reports
 
 
 def _resolve_db_path(db_path: str | Path | None) -> str | Path:
@@ -575,6 +636,7 @@ def _dashboard_context(db: sqlite3.Connection) -> dict[str, object]:
         "failure_evidence_cards": _failure_evidence_cards(sample_artifacts),
         "artifact_cards": ARTIFACT_CARDS,
         "latest_report": _latest_report_view_model(),
+        "report_history": _report_history_view_model(),
     }
 
 
@@ -716,9 +778,10 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         if not longrepr:
             longrepr = "No failure log was provided."
 
+        generated_at = datetime.now(UTC)
         artifact = FailureArtifact(
             nodeid=nodeid,
-            failed_at=datetime.now(UTC).isoformat(),
+            failed_at=generated_at.isoformat(),
             phase=phase,
             duration_seconds=0,
             longrepr=longrepr,
@@ -726,15 +789,27 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
         )
         prompt = build_diagnosis_prompt([artifact])
         report = diagnose_with_ai(prompt)
-        write_markdown_report(_web_report_path(), "中文 AI 诊断报告", report)
-        return RedirectResponse("/diagnosis-report", status_code=303)
+        report_path = _web_report_path(generated_at)
+        write_markdown_report(report_path, "中文 AI 诊断报告", report)
+        redirect_url = "/diagnosis-report"
+        if not os.getenv("AI_QA_REPORT_PATH"):
+            redirect_url = f"{redirect_url}?report={quote(report_path.name)}"
+        return RedirectResponse(redirect_url, status_code=303)
 
     @api.get("/diagnosis-report", response_class=HTMLResponse)
-    def diagnosis_report_page(request: Request) -> HTMLResponse:
+    def diagnosis_report_page(request: Request, report: str | None = None) -> HTMLResponse:
+        selected_path = None
+        if report is not None:
+            selected_path = _selected_report_path(report)
+            if selected_path is None:
+                raise HTTPException(status_code=404, detail="Report not found")
         return templates.TemplateResponse(
             request,
             "diagnosis_report.html",
-            {"latest_report": _latest_report_view_model()},
+            {
+                "latest_report": _latest_report_view_model(selected_path),
+                "report_history": _report_history_view_model(),
+            },
         )
 
     @api.get("/interview-review", response_class=HTMLResponse)
