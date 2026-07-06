@@ -4,29 +4,42 @@
 
 ## 一句话介绍
 
-这是一个 AI 自动化测试与缺陷诊断平台。它用 FastAPI 做一个可复现的 Demo Shop，用 pytest 和 Playwright 跑 API 与浏览器 E2E 测试；测试失败后，项目会收集 failure JSON、测试报告和可用时的截图或 trace，再生成 AI diagnosis、Failure Mode Matrix 和 dry-run PR comment preview。
+这是一个 AI 自动化测试与缺陷诊断平台。首页就是可直接使用的 AI QA 诊断工作台：面试官可以粘贴 pytest、Playwright 或 API 失败日志，生成中文 AI 诊断报告。底层仍然用 FastAPI、pytest、Playwright、failure JSON、CI artifacts 和 provider adapter 支撑完整工程闭环。
 
 ## 3 分钟演示路线
 
-1. 打开本地 Dashboard：`http://127.0.0.1:8000`
-2. 用 30 秒讲清平台能力：端到端 QA 自动化、失败证据链、AI 辅助诊断、Provider 安全边界、CI 作品集产物。
-3. 点击“进入 Demo Shop”，登录 `alice / password123`。
-4. 创建一笔订单，进入“订单创建成功”页面。
-5. 解释：下单不是项目终点，它只是一个真实被测业务场景，用来让 Playwright E2E 覆盖登录、商品、库存和订单链路。
-6. 回到 Dashboard 或打开 `qa-reports`，说明如果登录或下单失败，项目会保留 `pytest-report.html`、`failure JSON`、`ai-diagnosis.md` 和 `pr-comment.md`。
-7. 打开 `reports/examples/sample-ai-diagnosis.md`，重点讲 Failure Mode Matrix。
+1. 打开本地 AI QA 诊断工作台：`http://127.0.0.1:8000`
+2. 保留左侧默认失败日志，或粘贴一段 pytest / Playwright / API 失败输出。
+3. 点击“生成中文诊断报告”。
+4. 打开中文 AI 报告，重点讲 Failure Mode Matrix：分类、证据、候选根因 / 诊断假设和下一步建议。
+5. 指出 AI 诊断模式卡片：页面能显示当前是本地 fallback 还是实时 AI，但不展示密钥或内部配置。
+6. 如果面试官想看被测系统，再进入 Demo Shop，登录 `alice / password123` 并创建订单。
+7. 解释：Demo Shop 只是测试对象，真正产品能力是把失败日志转成可读的诊断报告。
 
-英文压缩版可以讲成：Dashboard -> Demo Shop order -> QA reports -> AI diagnosis -> PR comment preview。
+英文压缩版可以讲成：Workbench failure input -> Chinese AI diagnosis report -> Failure Mode Matrix -> optional Demo Shop evidence。
 
-## Dashboard 怎么讲
+## AI QA 诊断工作台怎么讲
 
 可以这样说：
 
-> 这个首页不是营销页，而是面试展示入口。它把项目拆成五个能力：自动化测试、失败证据链、AI diagnosis、Provider 安全边界和 CI artifact。面试官不用先读代码，也能在 30 秒内看懂项目主线。
+> 这个首页不是营销页，也不是单纯说明文档。它是一个可以直接使用的 AI QA 诊断工作台。面试官可以把测试失败日志粘进去，点击生成中文诊断报告，然后看到 Failure Mode Matrix、证据、候选根因和下一步建议。
+
+## 面试官审阅模式怎么讲
+
+可以这样说：
+
+> 如果面试官时间很短，我会先用首页工作台生成一份报告，再打开 `/interview-review`。这个页面按面试官视角组织：先看我测了什么，再看测试证据链，然后看 Failure Mode Matrix 和安全边界。
+
+这个页面要强调：
+
+- “我会怎么审这个项目”回答面试官的评估标准。
+- “测试证据链”说明 API / Service / E2E / CI 如何串起来。
+- “3 分钟讲解顺序”就是现场演示路线。
+- “安全边界”说明 AI 报告和 provider 状态不会泄漏敏感配置。
 
 如果面试官问“这些数据是真的吗”，可以回答：
 
-> Provider Status、商品数量、示例 artifact 数量和 provider preset 数量来自后端数据；Failure Mode Matrix 示例来自 `reports/examples`，是 curated demo data，用来稳定展示诊断结构，不伪装成当前 CI 真实失败。
+> 首页表单可以使用真实粘贴的失败日志；如果没有实时 AI key，系统会生成 fallback 报告。报告预览和 CI demo 也会使用 curated examples，用来稳定展示诊断结构，不伪装成当前 CI 真实失败。
 
 ## Demo Shop 下单怎么讲
 
@@ -76,7 +89,7 @@
 
 **Q：买完商品之后然后呢？**
 
-A：买商品只是被测业务场景。它用来让 Playwright E2E 覆盖真实登录和下单流程。真正价值在于：如果这个流程失败，项目会把失败转成 failure JSON、AI diagnosis、Failure Mode Matrix 和 PR comment preview。
+A：现在首页诊断工作台才是主要产品入口。买商品只是可选的被测业务场景，用来让 Playwright E2E 覆盖真实登录和下单流程。如果这个流程失败，项目会把失败转成 failure JSON、AI diagnosis、Failure Mode Matrix 和 PR comment preview。
 
 **Q：AI 在项目里到底做了什么？**
 
@@ -84,7 +97,7 @@ A：AI 不负责判断测试是否通过。pytest 和 Playwright 才是质量门
 
 **Q：这个项目是不是包装过度？**
 
-A：我刻意保留了边界：Dashboard 会标注 curated demo data，PR comment 是 dry-run preview，不调用 GitHub PR/Issues API，也不会自动发评论。Provider Status 也只展示 readiness，不暴露 secret。
+A：我刻意保留了边界：首页可以输入失败日志，但 AI 输出只叫候选根因 / 诊断假设；PR comment 是 dry-run preview，不调用 GitHub PR/Issues API，也不会自动发评论。Provider Status 也只展示 readiness，不暴露 secret。
 
 **Q：为什么不直接做一个聊天机器人？**
 
@@ -98,4 +111,4 @@ A：项目会生成 fallback report，CI 仍然保留 pytest report 和 failure 
 
 可以这样收尾：
 
-> 这个项目的重点不是电商功能本身，而是我把一个真实可测的业务流程、自动化测试、失败证据、AI 诊断、provider 安全边界和 CI artifact 串成了一个完整闭环。这也是我从自动化测试转向 AI 应用开发时最想展示的能力。
+> 这个项目的重点不是电商功能本身，而是一个可以直接使用的 AI QA 诊断工作台。它把测试失败日志、自动化测试、失败证据、AI 诊断、provider 安全边界和 CI artifact 串成了完整闭环。这也是我从自动化测试转向 AI 应用开发时最想展示的能力。

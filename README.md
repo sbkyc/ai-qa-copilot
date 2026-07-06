@@ -14,7 +14,9 @@ AI QA Copilot is a Python portfolio project that combines automated testing and 
 
 ## Portfolio Walkthrough
 
-For a 3-minute interview path, start with the Chinese Showcase Dashboard at `/`, enter the Demo Shop at `/login`, run the bundled diagnosis examples, and show the Failure Mode Matrix in the sample report.
+For a 3-minute interview path, start with the AI QA workbench at `/`: paste a pytest / Playwright / API failure log, generate a Chinese diagnosis report, then review the Failure Mode Matrix. The Demo Shop at `/login` is available as a small system under test, and `/interview-review` is a secondary reviewer summary.
+
+The `/interview-review` page is the fastest reviewer-facing path: it summarizes test coverage, the failure evidence chain, AI diagnosis boundaries, and the 3-minute talk track in one place.
 
 See [Portfolio Walkthrough](docs/portfolio-walkthrough.md) for the step-by-step demo script.
 
@@ -69,7 +71,15 @@ Open:
 http://127.0.0.1:8000
 ```
 
-The landing page is a Chinese portfolio Dashboard. The Demo Shop login is available at:
+The landing page is a Chinese AI QA workbench. Paste a pytest, Playwright, or API failure log, click **生成中文诊断报告**, then open:
+
+```text
+http://127.0.0.1:8000/diagnosis-report
+```
+
+Each web-generated report is saved as a timestamped local Markdown file and appears in the **最近诊断** history list, so reviewers can compare multiple failure logs without overwriting the previous result.
+
+The Demo Shop is a supporting system under test, not the main product. Its login is available at:
 
 ```text
 http://127.0.0.1:8000/login
@@ -228,7 +238,7 @@ See [docs/interview-qa.md](docs/interview-qa.md) for interview questions and sug
 
 See [docs/interview-walkthrough-zh.md](docs/interview-walkthrough-zh.md) for a 3-minute Chinese interview walkthrough.
 
-See [docs/interview-demo-script-zh.md](docs/interview-demo-script-zh.md) for a Chinese demo script that explains Dashboard -> Demo Shop order -> QA reports.
+See [docs/interview-demo-script-zh.md](docs/interview-demo-script-zh.md) for a Chinese demo script that explains Workbench failure input -> Chinese AI diagnosis report -> optional Demo Shop evidence.
 
 See [docs/application-package-zh.md](docs/application-package-zh.md) for copy-ready resume bullets, a 3-minute talk track, and interview Q&A.
 

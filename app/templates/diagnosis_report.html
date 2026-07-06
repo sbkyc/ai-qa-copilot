@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>中文 AI 诊断报告</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">AI QA Copilot</a>
+      <nav class="topbar-nav" aria-label="主导航">
+        <a href="/">工作台</a>
+        <a href="/interview-review">审阅模式</a>
+        <a href="/login">示例系统</a>
+        <a href="/diagnosis-report" aria-current="page">AI 报告</a>
+      </nav>
+    </header>
+
+    <main class="dashboard-shell">
+      <section class="dashboard-section report-page-panel" aria-labelledby="report-page-title">
+        <div class="section-heading">
+          <div>
+            <h1 id="report-page-title">中文 AI 诊断报告</h1>
+            <p>这里展示 AI 根据自动化测试失败证据生成的完整中文诊断内容。</p>
+          </div>
+          <a class="button-link button-link-secondary" href="/">返回工作台</a>
+        </div>
+
+        {% if latest_report.available %}
+          <section class="report-guidance-card" aria-labelledby="report-guidance-title">
+            <div>
+              <h2 id="report-guidance-title">报告使用建议</h2>
+              <p>先看失败模式矩阵，再结合证据和下一步建议判断处理顺序。</p>
+            </div>
+            <dl class="report-guidance-meta">
+              <div>
+                <dt>矩阵行数</dt>
+                <dd>{{ latest_report.guidance.row_count }}</dd>
+              </div>
+              <div>
+                <dt>优先关注</dt>
+                <dd>优先关注：{{ latest_report.guidance.primary_mode }}</dd>
+              </div>
+              <div>
+                <dt>建议动作</dt>
+                <dd>建议动作：{{ latest_report.guidance.next_action }}</dd>
+              </div>
+            </dl>
+            <div class="report-talk-track" aria-labelledby="report-talk-track-title">
+              <h3 id="report-talk-track-title">面试讲解摘要</h3>
+              <ol>
+                {% for item in latest_report.guidance.talk_track %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ol>
+            </div>
+            <div class="report-guidance-actions">
+              <a class="button-link" href="{{ latest_report.guidance.example_url }}">回到工作台换场景</a>
+              <a class="button-link button-link-secondary" href="/interview-review">面试官审阅模式</a>
+            </div>
+          </section>
+          <article class="report-document">
+            {{ latest_report.html | safe }}
+          </article>
+        {% else %}
+          <div class="report-preview-card">
+            <p>{{ latest_report.summary }}</p>
+            <a class="button-link" href="/">返回工作台</a>
+          </div>
+        {% endif %}
+
+        {% if report_history %}
+          <aside class="report-history-panel report-page-history" aria-labelledby="report-page-history-title">
+            <div class="section-heading">
+              <h2 id="report-page-history-title">最近诊断</h2>
+              <p>切换到其他已生成的报告。</p>
+            </div>
+            <div class="report-history-list">
+              {% for report in report_history %}
+                <a class="report-history-item" href="{{ report.url }}">
+                  <span>{{ report.generated_at }}</span>
+                  <strong>{{ report.title }}</strong>
+                  <p>{{ report.summary }}</p>
+                </a>
+              {% endfor %}
+            </div>
+          </aside>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

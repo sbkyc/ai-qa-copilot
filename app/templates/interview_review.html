@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>面试官审阅模式</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">AI QA Copilot</a>
+      <nav class="topbar-nav" aria-label="主导航">
+        <a href="/">工作台</a>
+        <a href="/interview-review" aria-current="page">审阅模式</a>
+        <a href="/login">示例系统</a>
+        <a href="/diagnosis-report">AI 报告</a>
+      </nav>
+    </header>
+
+    <main class="dashboard-shell review-shell">
+      <section class="dashboard-hero review-hero" aria-labelledby="review-title">
+        <div class="dashboard-hero-copy">
+          <h1 id="review-title">面试官审阅模式</h1>
+          <p>
+            这一页按自动化测试面试官的视角组织：先看测试设计，再看测试证据链，
+            最后看 AI 如何把失败整理成适合团队审阅的中文诊断材料。
+          </p>
+          <div class="hero-actions">
+            <a class="button-link" href="/login">体验被测系统</a>
+            <a class="button-link button-link-secondary" href="/diagnosis-report">查看中文 AI 报告</a>
+            <a class="button-link button-link-secondary" href="/">返回工作台</a>
+          </div>
+        </div>
+        <aside class="hero-summary" aria-label="审阅摘要">
+          <div>
+            <span>测试分层</span>
+            <strong>4</strong>
+          </div>
+          <div>
+            <span>被测商品</span>
+            <strong>{{ product_count }}</strong>
+          </div>
+          <div>
+            <span>诊断模式</span>
+            <strong>{{ ai_mode.status_label }}</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="review-score-title">
+        <div class="section-heading">
+          <h2 id="review-score-title">我会怎么审这个项目</h2>
+          <p>如果我是面试官，我会优先看这四件事：覆盖是否分层、失败是否有证据、AI 是否有边界、安全是否讲得清楚。</p>
+        </div>
+        <div class="review-score-grid">
+          {% for card in scorecards %}
+            <article class="review-score-card">
+              <strong>{{ card.grade }}</strong>
+              <h3>{{ card.title }}</h3>
+              <p>{{ card.body }}</p>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="evidence-chain-title">
+        <div class="section-heading">
+          <h2 id="evidence-chain-title">测试证据链</h2>
+          <p>API / Service / E2E / CI 不是堆名词，而是从断言失败到团队审阅摘要的一条链路。</p>
+        </div>
+        <ol class="pipeline-steps review-chain">
+          {% for step in pipeline_steps %}
+            <li>
+              <span>{{ loop.index }}</span>
+              <strong>{{ step }}</strong>
+            </li>
+          {% endfor %}
+        </ol>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="coverage-review-title">
+        <div class="section-heading">
+          <h2 id="coverage-review-title">测试覆盖怎么讲</h2>
+          <p>这一块用来回答“你到底测了什么”。每张卡片都对应可以在代码里找到的测试层级。</p>
+        </div>
+        <div class="coverage-grid">
+          {% for card in coverage_cards %}
+            <article class="coverage-card">
+              <div>
+                <strong>{{ card.badge }}</strong>
+                <h3>{{ card.title }}</h3>
+                <p>{{ card.body }}</p>
+              </div>
+              <ul class="check-list">
+                {% for check in card.checks %}
+                  <li>{{ check }}</li>
+                {% endfor %}
+              </ul>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="failure-review-title">
+        <div class="section-heading">
+          <h2 id="failure-review-title">失败模式矩阵怎么读</h2>
+          <p>重点不是让 AI 下结论，而是把失败证据整理成分类、候选根因 / 诊断假设和下一步行动。</p>
+        </div>
+        <div class="evidence-grid">
+          {% for card in failure_evidence_cards %}
+            <article class="evidence-card">
+              <strong>{{ card.mode }}</strong>
+              <h3>{{ card.test_name }}</h3>
+              <dl>
+                <div>
+                  <dt>阶段</dt>
+                  <dd>{{ card.phase }}</dd>
+                </div>
+                <div>
+                  <dt>关键证据</dt>
+                  <dd>{{ card.evidence }}</dd>
+                </div>
+              </dl>
+              <p>{{ card.qa_value }}</p>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="dashboard-section review-two-column" aria-labelledby="talk-track-title">
+        <div class="panel review-talk-card">
+          <h2 id="talk-track-title">3 分钟讲解顺序</h2>
+          <ol>
+            {% for step in review_steps %}
+              <li>{{ step }}</li>
+            {% endfor %}
+          </ol>
+        </div>
+        <div class="panel review-boundary-card">
+          <h2>安全边界</h2>
+          <p>
+            页面只展示脱敏状态和安全摘要，不展示密钥、内部地址、模型名或密钥来源。
+            AI 报告用于辅助审阅，不能替代 pytest、Playwright 和 CI 的质量门禁。
+          </p>
+          <p>
+            真实公司日志公开前必须人工检查；本项目页面只展示适合面试的安全演示材料。
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

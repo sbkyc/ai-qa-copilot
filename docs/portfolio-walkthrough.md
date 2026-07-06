@@ -1,18 +1,22 @@
 # Portfolio Walkthrough
 
-This walkthrough is the shortest path for showing AI QA Copilot in an interview or portfolio review. It connects the visible demo app, provider safety checks, test automation artifacts, and AI diagnosis output into one story.
+This walkthrough is the shortest path for showing AI QA Copilot in an interview or portfolio review. It starts from the usable web workbench, then connects provider safety checks, test automation artifacts, and AI diagnosis output into one story.
 
 ## 3-Minute Interview Path
 
-1. Open the Chinese Showcase Dashboard at `/`.
-2. Explain the visible project path: Dashboard -> Demo Shop order -> QA reports -> AI diagnosis -> dry-run PR comment preview.
-3. Enter the Demo Shop, log in with the demo account, and create an order.
-4. Use the order-success page to explain that the shop is the system under test, not the final product goal.
-5. Point out the Provider Status card: it shows readiness without exposing API keys, model names, key source environment variables, or custom base URLs.
-6. Run the bundled failure examples through the CLI.
-7. Open the generated report or the curated sample report.
-8. Explain the Failure Mode Matrix: it separates product/API bugs, contract drift, UI/E2E failures, flaky timing, and environment/setup failures.
-9. Optionally open the PR comment preview to show how the diagnosis could fit a code review workflow.
+1. Open the AI QA workbench at `/`.
+2. Paste a pytest, Playwright, or API failure log into the form and click **生成中文诊断报告**.
+3. Open `/diagnosis-report` and explain the Failure Mode Matrix: it separates product/API bugs, contract drift, UI/E2E failures, flaky timing, and environment/setup failures.
+4. Point out the AI diagnosis mode card: it shows whether live AI is configured without exposing API keys, model names, key source environment variables, or custom base URLs.
+5. Optionally enter the Demo Shop at `/login`, create an order, and explain that the shop is only a supporting system under test.
+6. Use the bundled failure examples or CI artifacts to show repeatable evidence outside the web form.
+7. Optionally open the PR comment preview to show how the diagnosis could fit a code review workflow.
+
+Compressed path:
+
+```text
+Workbench failure input -> Chinese AI diagnosis report -> Failure Mode Matrix -> optional Demo Shop evidence
+```
 
 ## Run The Demo App
 
@@ -35,7 +39,9 @@ password: password123
 
 These are local demo credentials only; do not reuse them in production.
 
-The products page includes Provider Status. The same provider health data is also available from the redacted API endpoint:
+The homepage is the workbench. The left form accepts a failure name, phase, keywords, and failure log; the generated report is shown at `/diagnosis-report`.
+
+The workbench also includes an AI diagnosis mode card. The same provider health data is available from the redacted API endpoint:
 
 ![Provider Status card](assets/provider-status.png)
 
@@ -45,15 +51,15 @@ Invoke-RestMethod http://127.0.0.1:8000/api/provider-health
 
 ## What Happens After Buying A Product
 
-The order flow is intentionally small. It exists as the system under test for API and Playwright E2E automation.
+The order flow is intentionally small and optional. It exists as the system under test for API and Playwright E2E automation.
 
 When the order succeeds, the success page explains the next step: the order path proves the demo system can be exercised by a browser test. If login, product loading, inventory, or order creation fails, the project can preserve the failure as structured evidence and turn it into a diagnosis report.
 
 The interview message is:
 
 ```text
-Buying a product is not the product goal.
-It is the real business path used to demonstrate automated testing and failure diagnosis.
+The workbench is the product surface.
+The shop is the real business path used to demonstrate automated testing and failure diagnosis.
 ```
 
 ## Generate A Diagnosis Demo

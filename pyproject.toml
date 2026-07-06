@@ -28,7 +28,7 @@ qa-copilot = "qa_copilot.cli:main"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-addopts = "-q --strict-markers --html=reports/latest/pytest-report.html --self-contained-html"
+addopts = "-q --strict-markers --html=reports/latest/pytest-report.html --self-contained-html --junitxml=reports/latest/junit.xml"
 markers = [
   "e2e: browser-based end-to-end tests",
 ]

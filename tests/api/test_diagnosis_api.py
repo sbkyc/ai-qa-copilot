@@ -19,7 +19,7 @@ def test_generate_diagnosis_from_failure_context(client, monkeypatch):
     assert response.status_code == 200
     payload = response.json()
     assert payload["artifact_count"] == 1
-    assert "API key is not configured" in payload["report_markdown"]
+    assert "未配置 AI 服务密钥" in payload["report_markdown"]
 
 
 def test_generate_diagnosis_validates_required_context(client):

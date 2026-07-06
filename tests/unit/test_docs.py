@@ -16,6 +16,7 @@ SAMPLE_PR_COMMENT = Path("reports/examples/sample-pr-comment.md")
 CI_WORKFLOW = Path(".github/workflows/ci.yml")
 DEMO_WORKFLOW = Path(".github/workflows/demo-artifacts.yml")
 CI_ARTIFACTS_DOC = Path("docs/ci-artifacts.md")
+PYPROJECT = Path("pyproject.toml")
 VISUAL_ASSETS = (
     Path("docs/assets/provider-status.png"),
     Path("docs/assets/failure-mode-matrix.png"),
@@ -46,7 +47,8 @@ def test_readme_links_portfolio_walkthrough():
 
     assert "[Portfolio Walkthrough](docs/portfolio-walkthrough.md)" in readme
     assert "3-minute interview path" in readme
-    assert "Chinese Showcase Dashboard" in readme
+    assert "AI QA workbench" in readme
+    assert "/interview-review" in readme
     assert "http://127.0.0.1:8000/login" in readme
 
 
@@ -213,9 +215,11 @@ def test_chinese_demo_script_explains_order_flow_and_next_steps():
     script = INTERVIEW_DEMO_SCRIPT_ZH.read_text(encoding="utf-8")
 
     for phrase in (
-        "买商品只是被测业务场景",
+        "面试官审阅模式",
+        "/interview-review",
+        "买商品只是可选的被测业务场景",
         "下单成功不是终点",
-        "Dashboard -> Demo Shop order -> QA reports",
+        "Workbench failure input -> Chinese AI diagnosis report",
         "failure JSON",
         "AI diagnosis",
         "pr-comment.md",
@@ -233,7 +237,7 @@ def test_application_package_is_copy_ready_for_job_search():
     for phrase in (
         "简历项目经历 4 条 bullet",
         "3 分钟演示讲稿",
-        "Dashboard -> Demo Shop 下单 -> failure artifacts",
+        "AI QA 诊断工作台",
         "候选根因 / 诊断假设",
         "不调用 GitHub PR/Issues API",
         "不会自动评论 PR",
@@ -250,9 +254,9 @@ def test_application_package_is_copy_ready_for_job_search():
 def test_portfolio_walkthrough_explains_order_flow_purpose():
     walkthrough = WALKTHROUGH.read_text(encoding="utf-8")
 
-    assert "Dashboard -> Demo Shop order -> QA reports" in walkthrough
+    assert "Workbench failure input" in walkthrough
     assert "What Happens After Buying A Product" in walkthrough
-    assert "Buying a product is not the product goal." in walkthrough
+    assert "The workbench is the product surface." in walkthrough
     assert "system under test" in walkthrough
 
 
@@ -296,6 +300,15 @@ def test_ci_generates_pr_comment_preview_artifact():
         "Generate PR comment preview"
     )
     assert workflow.index("Generate PR comment preview") < workflow.index("Upload reports")
+
+
+def test_ci_feeds_junit_xml_into_ai_diagnosis():
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+    pyproject = PYPROJECT.read_text(encoding="utf-8")
+
+    assert "--junitxml=reports/latest/junit.xml" in pyproject
+    assert "--junit-xml reports/latest/junit.xml" in workflow
+    assert "reports/latest/junit.xml" in workflow
 
 
 def test_ci_pr_comment_preview_stays_dry_run():
